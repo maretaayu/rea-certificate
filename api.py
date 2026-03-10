@@ -124,14 +124,14 @@ def generate_cert(nama: str, sesi: str, urutan: str):
         # 1. Tempel Cap (Layer bawah)
         if os.path.exists(SIGNATURE_PATH_2):
              cap_img = Image.open(SIGNATURE_PATH_2).convert("RGBA")
-             # Ukuran cap lebih dikecilkan lagi (lebar sekitar 200px)
-             w_percent = (200 / float(cap_img.size[0]))
+             # Ukuran cap lebih dibesarkan (lebar sekitar 400px)
+             w_percent = (400 / float(cap_img.size[0]))
              h_size = int((float(cap_img.size[1]) * float(w_percent)))
-             cap_img = cap_img.resize((200, h_size), Image.Resampling.LANCZOS)
+             cap_img = cap_img.resize((400, h_size), Image.Resampling.LANCZOS)
              
-             # Digeser lebih jauh ke Kanan (+150 pixel dari titik tengah 1754)
-             pos_x = (1754 + 150) - (cap_img.size[0] // 2)
-             pos_y = 1780 # Digeser lebih ke atas mendekati bawah tanggal
+             # Digeser ke tengah persis sejajar dengan TTD
+             pos_x = 1754 - (cap_img.size[0] // 2)
+             pos_y = 1820 # Digeser lebih ke bawah menghindari numpuk parah di atas
              temp_image.paste(cap_img, (pos_x, pos_y), mask=cap_img)
              
         # 2. Tempel TTD (Layer atas)
