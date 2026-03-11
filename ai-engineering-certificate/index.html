@@ -47,11 +47,79 @@
             flex-direction: column;
             box-sizing: border-box;
             background-image:
-                linear-gradient(135deg, rgba(240, 249, 255, 0.5) 0%, transparent 40%),
-                radial-gradient(circle at 100% 100%, rgba(240, 249, 255, 0.8) 0%, transparent 50%);
+                linear-gradient(135deg, rgba(240, 249, 255, 0.9) 0%, transparent 35%),
+                linear-gradient(to right, rgba(224, 242, 254, 0.4) 0px, transparent 180px),
+                radial-gradient(circle at 100% 100%, rgba(224, 242, 254, 0.8) 0%, transparent 50%);
         }
 
-        /* Pure whitespace layout - NO outer borders */
+        /* Elegant Grid Pattern - Engineering Vibe */
+        .ambient-mesh {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(2, 132, 199, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(2, 132, 199, 0.04) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: 0;
+            mask-image: radial-gradient(ellipse at center, transparent 30%, black 100%);
+            -webkit-mask-image: radial-gradient(ellipse at center, transparent 30%, black 100%);
+            pointer-events: none;
+        }
+
+        /* Double minimal frame */
+        .border-line-outer {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            right: 24px;
+            bottom: 24px;
+            border: 1px solid rgba(2, 132, 199, 0.2);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .border-line-inner {
+            position: absolute;
+            top: 32px;
+            left: 32px;
+            right: 32px;
+            bottom: 32px;
+            border: 1px solid rgba(196, 169, 98, 0.35);
+            /* Soft Gold Edge */
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Accent Structural Corner Boxes */
+        .accent-box {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #FFFFFF;
+            border: 1px solid rgba(196, 169, 98, 0.8);
+            /* Gold corners */
+            z-index: 2;
+        }
+
+        .ab-tl {
+            top: 20px;
+            left: 20px;
+        }
+
+        .ab-tr {
+            top: 20px;
+            right: 20px;
+        }
+
+        .ab-bl {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .ab-br {
+            bottom: 20px;
+            right: 20px;
+        }
 
         .content-container {
             flex: 1;
@@ -297,6 +365,14 @@
 
 <body>
     <div class="certificate-wrapper">
+        <div class="ambient-mesh"></div>
+        <div class="border-line-outer"></div>
+        <div class="border-line-inner"></div>
+        <div class="accent-box ab-tl"></div>
+        <div class="accent-box ab-tr"></div>
+        <div class="accent-box ab-bl"></div>
+        <div class="accent-box ab-br"></div>
+
         <div class="content-container">
             <!-- Header -->
             <div class="top-nav">
@@ -320,9 +396,7 @@
                 <h2 class="recipient-name">{{NAMA}}</h2>
 
                 <div class="description">
-                    For demonstrating exceptional dedication and fulfilling all comprehensive curriculum requirements,
-                    thereby earning the status of <span class="status {{STATUS_CLASS}}">{{STATUS}}</span> in the
-                    following program:
+                    {{DESCRIPTION_HTML}}
                 </div>
 
                 <div class="program-block">
