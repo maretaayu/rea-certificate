@@ -8,19 +8,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Great+Vibes&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --rea-deep-navy: #0A192F;
-            --rea-blue-marine: #0284C7;
-            --rea-blue-soft: #F0F9FF;
-            /* Sangat soft/hampir putih */
+            /* REA Soft Blue & Navy Palette */
+            --rea-navy-dark: #0F172A;
+            --rea-navy-light: #1E293B;
+            --rea-blue-primary: #0284C7;
+            --rea-blue-soft: #E0F2FE;
+            --rea-blue-ultra-soft: #F0F9FF;
 
-            --text-main: #334155;
-            --text-light: #94A3B8;
-
-            --bg-color: #FFFFFF;
+            --text-body: #475569;
+            --text-muted: #94A3B8;
         }
 
         body {
@@ -35,107 +35,82 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* 
+         * ORGANIC LUXURY DESIGN
+         * Soft, sweeping "REA Blue" gradients with a pristine glass-like frosted inner frame.
+         * Zero rigid geometric shapes, zero corporate lines, zero classic roman borders.
+         * Extremely aesthetic and breathable whitespace.
+         */
         .certificate-wrapper {
             position: relative;
             width: 1200px;
             height: 848px;
-            background-color: var(--bg-color);
-            box-shadow: 0 40px 100px -20px rgba(10, 25, 47, 0.15);
-            /* Soft, deep shadow */
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-            background-image:
-                linear-gradient(135deg, rgba(240, 249, 255, 0.9) 0%, transparent 35%),
-                linear-gradient(to right, rgba(224, 242, 254, 0.4) 0px, transparent 180px),
-                radial-gradient(circle at 100% 100%, rgba(224, 242, 254, 0.8) 0%, transparent 50%);
-        }
-
-        /* Elegant Grid Pattern - Engineering Vibe */
-        .ambient-mesh {
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(2, 132, 199, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(2, 132, 199, 0.04) 1px, transparent 1px);
-            background-size: 30px 30px;
-            z-index: 0;
-            mask-image: radial-gradient(ellipse at center, transparent 30%, black 100%);
-            -webkit-mask-image: radial-gradient(ellipse at center, transparent 30%, black 100%);
-            pointer-events: none;
-        }
-
-        /* Double minimal frame */
-        .border-line-outer {
-            position: absolute;
-            top: 24px;
-            left: 24px;
-            right: 24px;
-            bottom: 24px;
-            border: 1px solid rgba(2, 132, 199, 0.2);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .border-line-inner {
-            position: absolute;
-            top: 32px;
-            left: 32px;
-            right: 32px;
-            bottom: 32px;
-            border: 1px solid rgba(196, 169, 98, 0.35);
-            /* Soft Gold Edge */
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        /* Accent Structural Corner Boxes */
-        .accent-box {
-            position: absolute;
-            width: 8px;
-            height: 8px;
             background-color: #FFFFFF;
-            border: 1px solid rgba(196, 169, 98, 0.8);
-            /* Gold corners */
-            z-index: 2;
+            /* Beautiful overlapping soft gradients */
+            background-image:
+                radial-gradient(circle at 100% 0%, var(--rea-blue-soft) 0%, rgba(255, 255, 255, 0) 50%),
+                radial-gradient(circle at 0% 100%, var(--rea-blue-ultra-soft) 0%, rgba(255, 255, 255, 0) 60%),
+                radial-gradient(circle at 50% 50%, #ffffff 0%, #ffffff 100%);
+            box-shadow: 0 30px 80px -20px rgba(15, 23, 42, 0.15);
+            display: flex;
+            padding: 45px;
+            /* Spacing for the outer canvas */
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
-        .ab-tl {
-            top: 20px;
-            left: 20px;
+        /* Deep, soft ethereal glow overlays */
+        .ethereal-glow-1 {
+            position: absolute;
+            top: -150px;
+            right: -100px;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(2, 132, 199, 0.08) 0%, transparent 70%);
+            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .ab-tr {
-            top: 20px;
-            right: 20px;
+        .ethereal-glow-2 {
+            position: absolute;
+            bottom: -200px;
+            left: -150px;
+            width: 900px;
+            height: 900px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.05) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .ab-bl {
-            bottom: 20px;
-            left: 20px;
-        }
-
-        .ab-br {
-            bottom: 20px;
-            right: 20px;
-        }
-
-        .content-container {
-            flex: 1;
+        /* The minimalist floating frosted card */
+        .inner-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            /* Frosted glass effect */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            /* Single delicate hairline border */
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow:
+                inset 0 0 0 1px rgba(2, 132, 199, 0.05),
+                0 10px 40px -10px rgba(2, 132, 199, 0.05);
+            z-index: 10;
             display: flex;
             flex-direction: column;
-            padding: 70px 100px;
-            position: relative;
-            z-index: 10;
+            padding: 65px 90px;
+            box-sizing: border-box;
         }
 
-        /* Top Header */
+        /* Header Layout */
         .top-nav {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            /* Align bottom to match text baselines */
+            align-items: flex-start;
             margin-bottom: 70px;
         }
 
@@ -146,19 +121,19 @@
         }
 
         .brand-logo-rea {
-            height: 42px;
+            height: 55px;
             object-fit: contain;
         }
 
         .brand-logo-sa {
-            height: 28px;
+            height: 36px;
             object-fit: contain;
         }
 
         .brand-logo-separator {
             width: 1px;
-            height: 30px;
-            background-color: #CBD5E1;
+            height: 40px;
+            background-color: rgba(2, 132, 199, 0.2);
         }
 
         .cert-id-block {
@@ -167,21 +142,27 @@
 
         .cert-id-label {
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 2px;
-            color: var(--text-light);
+            color: var(--text-muted);
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .cert-id-val {
-            font-size: 12px;
-            font-weight: 500;
+            font-family: 'Plus Jakarta Sans', monospace;
+            font-size: 13px;
+            font-weight: 600;
             letter-spacing: 1px;
-            color: var(--text-main);
+            color: var(--rea-navy-light);
+            background: #FFFFFF;
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(2, 132, 199, 0.08);
         }
 
-        /* Main Typography (Minimalist Left Aligned) */
+        /* Main Typography Body */
         .main-body {
             flex: 1;
             display: flex;
@@ -191,61 +172,73 @@
         }
 
         .awarded-to {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 500;
-            color: var(--text-light);
+            color: var(--text-muted);
             letter-spacing: 3px;
             text-transform: uppercase;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        .cert-type-text {
+            color: var(--rea-blue-primary);
+            font-weight: 800;
+            letter-spacing: 5px;
+            margin-right: 12px;
         }
 
         .recipient-name {
             font-family: 'Playfair Display', serif;
-            font-size: 80px;
-            /* Massive, elegant serif */
-            font-weight: 400;
-            /* Lighter weight for elegance */
-            color: var(--rea-deep-navy);
+            font-size: 82px;
+            font-weight: 500;
+            color: var(--rea-navy-dark);
             margin: 0 0 30px 0;
             line-height: 1;
-            letter-spacing: -1px;
+            letter-spacing: -2px;
+            position: relative;
         }
 
         .description {
             font-size: 16px;
             font-weight: 400;
-            color: var(--text-main);
+            color: var(--text-body);
             max-width: 800px;
             line-height: 1.8;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
         }
 
         /* Dynamic Status Styling */
         .status {
-            font-weight: 600;
-            letter-spacing: 1px;
-            padding: 0 4px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            border-radius: 6px;
             text-transform: uppercase;
+            font-size: 14px;
         }
 
         .status-passed {
-            color: var(--rea-blue-marine);
+            color: var(--rea-blue-primary);
+            background: rgba(2, 132, 199, 0.1);
         }
 
         .status-best {
-            color: #8A6D1C;
+            color: #A67C00;
+            background: rgba(166, 124, 0, 0.15);
         }
 
         .program-block {
-            margin-top: 20px;
-            padding-top: 20px;
+            margin-top: 15px;
         }
 
         .program-name {
             font-family: 'Playfair Display', serif;
-            font-size: 26px;
+            font-size: 28px;
+            font-style: italic;
             font-weight: 500;
-            color: var(--rea-deep-navy);
+            color: var(--rea-navy-dark);
             letter-spacing: 0.5px;
             margin: 0;
         }
@@ -256,7 +249,7 @@
             justify-content: space-between;
             align-items: flex-end;
             margin-top: auto;
-            padding-top: 40px;
+            padding-top: 35px;
         }
 
         .footer-left {
@@ -268,82 +261,84 @@
         .date-issue {
             font-family: 'Playfair Display', serif;
             font-size: 22px;
-            font-style: italic;
-            font-weight: 500;
-            color: var(--rea-deep-navy);
+            font-weight: 600;
+            color: var(--rea-navy-dark);
         }
 
         .date-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-light);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-top: 5px;
+            margin-top: 6px;
         }
 
         .verify-info {
-            font-size: 10px;
+            font-size: 11px;
             line-height: 1.6;
-            color: var(--text-light);
+            color: var(--text-muted);
             max-width: 350px;
         }
 
         .verify-link {
             font-weight: 600;
-            color: var(--rea-blue-marine);
+            color: var(--rea-blue-primary);
             text-decoration: none;
         }
 
         .signature-block {
             position: relative;
-            width: 320px;
+            width: 260px;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
+            /* Center align for better visual balance */
+            text-align: center;
         }
 
         .stamp-img {
             position: absolute;
-            left: 85px;
-            /* Digeser jauh ke kanan */
-            bottom: 40px;
-            width: 120px;
-            /* Dikecilkan dari 150px */
+            left: 5px;
+            /* Stick stamp to left */
+            bottom: 35px;
+            width: 135px;
             height: auto;
-            /* Dikurangi supaya nampak seperti cap tipis/transparan */
+            opacity: 0.55;
             mix-blend-mode: multiply;
             z-index: 1;
             pointer-events: none;
         }
 
         .signature-real-img {
-            height: 120px;
+            height: 105px;
             width: auto;
             object-fit: contain;
             z-index: 2;
             position: relative;
             margin-bottom: -15px;
-            margin-left: 20px;
-            /* Slight offset overlapping with stamp */
+            margin-left: 35px;
+            /* Offset signature slightly right to overlap smoothly */
         }
 
         .signer-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--rea-deep-navy);
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--rea-navy-dark);
             letter-spacing: 1px;
             text-transform: uppercase;
             margin: 0;
-            padding-top: 10px;
-            border-top: 1px solid #CBD5E1;
+            padding-top: 15px;
+            border-top: 1px solid rgba(15, 23, 42, 0.15);
             width: 100%;
+            z-index: 3;
+            position: relative;
         }
 
         .signer-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
-            color: var(--text-light);
+            color: var(--text-body);
             margin: 4px 0 0 0;
         }
 
@@ -358,6 +353,13 @@
                 box-shadow: none;
                 width: 100%;
                 height: 100vh;
+                padding: 0;
+            }
+
+            .inner-frame {
+                box-shadow: none;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                border-radius: 0;
             }
         }
     </style>
@@ -365,15 +367,13 @@
 
 <body>
     <div class="certificate-wrapper">
-        <div class="ambient-mesh"></div>
-        <div class="border-line-outer"></div>
-        <div class="border-line-inner"></div>
-        <div class="accent-box ab-tl"></div>
-        <div class="accent-box ab-tr"></div>
-        <div class="accent-box ab-bl"></div>
-        <div class="accent-box ab-br"></div>
+        <!-- Pure Soft Ethereal Glowing Gradients -->
+        <div class="ethereal-glow-1"></div>
+        <div class="ethereal-glow-2"></div>
 
-        <div class="content-container">
+        <!-- Glassmorphism Floating Card Container -->
+        <div class="inner-frame">
+
             <!-- Header -->
             <div class="top-nav">
                 <div class="brand-logos">
@@ -387,11 +387,12 @@
                 </div>
             </div>
 
-            <!-- Main Body -->
+            <!-- Main Content Layer -->
             <div class="main-body">
-                <div class="awarded-to"><span
-                        style="color: var(--rea-blue-marine); font-weight: 700;">{{CERT_TYPE}}</span> IS PROUDLY AWARDED
-                    TO</div>
+                <div class="awarded-to">
+                    <span class="cert-type-text">{{CERT_TYPE}}</span>
+                    <span>IS PROUDLY AWARDED TO</span>
+                </div>
 
                 <h2 class="recipient-name">{{NAMA}}</h2>
 
@@ -404,7 +405,7 @@
                 </div>
             </div>
 
-            <!-- Footer -->
+            <!-- Footer Layer -->
             <div class="footer">
                 <div class="footer-left">
                     <div>
@@ -419,7 +420,6 @@
                 </div>
 
                 <div class="signature-block">
-                    <!-- Overlapping Real Stamp and Signature -->
                     <img src="/assets/cap-rg.png" alt="Ruangguru Stamp" class="stamp-img">
                     <img src="/assets/TTD dan Cap-01.png" alt="Alvin Tamie Signature" class="signature-real-img">
 
@@ -427,6 +427,7 @@
                     <p class="signer-title">Chief Technology Officer, Ruangguru</p>
                 </div>
             </div>
+
         </div>
     </div>
 </body>
