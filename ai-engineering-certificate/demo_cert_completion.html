@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificate Mareta Ayu Handanari</title>
+    <title>Certificate Budi Pratama</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -21,6 +21,39 @@
 
             --text-body: #475569;
             --text-muted: #94A3B8;
+        }
+
+        /* Certificate Themes */
+        .theme-excellence {
+            --bg-gradient-1: #E0F2FE;
+            --bg-gradient-2: #BAE6FD;
+            --bg-gradient-3: #F0F9FF;
+            --glow-1: rgba(2, 132, 199, 0.1);
+            --glow-2: rgba(14, 165, 233, 0.08);
+            --glow-3: rgba(56, 189, 248, 0.05);
+            --pattern-1: rgba(2, 132, 199, 0.03);
+            --pattern-2: rgba(2, 132, 199, 0.02);
+            --text-grad-1: #0284C7;
+            --text-grad-2: #0369A1;
+        }
+
+        .theme-completion {
+            /* Neutral Taupe / Ash Brown Premium Theme (No Yellow Tint) */
+            --bg-gradient-1: #F2F0ED;
+            /* Neutral Oatmeal */
+            --bg-gradient-2: #E5E2DD;
+            /* Cool Taupe */
+            --bg-gradient-3: #FAF9F8;
+            /* Pearl White */
+            --glow-1: rgba(120, 110, 100, 0.1);
+            --glow-2: rgba(150, 140, 130, 0.08);
+            --glow-3: rgba(180, 175, 170, 0.05);
+            --pattern-1: rgba(80, 75, 70, 0.05);
+            --pattern-2: rgba(80, 75, 70, 0.03);
+            --text-grad-1: #6D645E;
+            /* Stone Brown */
+            --text-grad-2: #2D2926;
+            /* Deep Anthracite Brown */
         }
 
         body {
@@ -46,11 +79,11 @@
             width: 1200px;
             height: 848px;
             background-color: #FFFFFF;
-            /* Beautiful overlapping soft gradients */
+            /* Beautiful overlapping soft gradients that adapt to the active theme */
             background-image:
-                radial-gradient(circle at 100% 0%, var(--rea-blue-soft) 0%, rgba(255, 255, 255, 0) 50%),
-                radial-gradient(circle at 0% 100%, var(--rea-blue-ultra-soft) 0%, rgba(255, 255, 255, 0) 60%),
-                radial-gradient(circle at 50% 50%, #ffffff 0%, #ffffff 100%);
+                radial-gradient(circle at 100% 0%, var(--bg-gradient-1) 0%, rgba(255, 255, 255, 0) 50%),
+                radial-gradient(circle at 0% 100%, var(--bg-gradient-2) 0%, rgba(255, 255, 255, 0) 60%),
+                radial-gradient(circle at 0% 0%, var(--bg-gradient-3) 0%, rgba(255, 255, 255, 0) 40%);
             box-shadow: 0 30px 80px -20px rgba(15, 23, 42, 0.15);
             display: flex;
             padding: 45px;
@@ -59,14 +92,14 @@
             overflow: hidden;
         }
 
-        /* Deep, soft ethereal glow overlays */
+        /* Fresh, vibrant ethereal aurora glows */
         .ethereal-glow-1 {
             position: absolute;
             top: -150px;
             right: -100px;
             width: 800px;
             height: 800px;
-            background: radial-gradient(circle, rgba(2, 132, 199, 0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--glow-1) 0%, transparent 70%);
             filter: blur(60px);
             z-index: 0;
             pointer-events: none;
@@ -78,10 +111,52 @@
             left: -150px;
             width: 900px;
             height: 900px;
-            background: radial-gradient(circle, rgba(14, 165, 233, 0.05) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--glow-2) 0%, transparent 70%);
             filter: blur(80px);
             z-index: 0;
             pointer-events: none;
+        }
+
+        .ethereal-glow-3 {
+            position: absolute;
+            top: 20%;
+            left: 30%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--glow-3) 0%, transparent 60%);
+            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Ambient interwoven precise pattern */
+        .inner-pattern-bg {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--pattern-1) 1px, transparent 1px),
+                linear-gradient(90deg, var(--pattern-1) 1px, transparent 1px),
+                linear-gradient(45deg, var(--pattern-2) 1px, transparent 1px),
+                linear-gradient(-45deg, var(--pattern-2) 1px, transparent 1px);
+            background-size: 40px 40px, 40px 40px, 28px 28px, 28px 28px;
+            background-position: -1px -1px, -1px -1px, 0 0, 0 0;
+            border-radius: 20px;
+            mask-image: radial-gradient(circle at 100% 100%, black 10%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at 100% 100%, black 10%, transparent 80%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .watermark-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            opacity: 0.03;
+            z-index: 1;
+            pointer-events: none;
+            filter: grayscale(100%);
         }
 
         /* The minimalist floating frosted card */
@@ -106,12 +181,33 @@
             box-sizing: border-box;
         }
 
+        /* Minimalist Exclusive Frame Border */
+        .elegant-inner-border {
+            position: absolute;
+            inset: 25px;
+            border: 2px solid var(--rea-navy-light);
+            opacity: 0.25;
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .elegant-inner-border::before {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border: 1px solid var(--rea-navy-light);
+            border-radius: 6px;
+        }
+
         /* Header Layout */
         .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 70px;
+            position: relative;
+            z-index: 10;
         }
 
         .brand-logos {
@@ -169,6 +265,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
+            position: relative;
+            z-index: 10;
         }
 
         .awarded-to {
@@ -183,7 +281,10 @@
         }
 
         .cert-type-text {
-            color: var(--rea-blue-primary);
+            background: linear-gradient(135deg, var(--text-grad-1) 0%, var(--text-grad-2) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             font-weight: 800;
             letter-spacing: 5px;
             margin-right: 12px;
@@ -191,12 +292,12 @@
 
         .recipient-name {
             font-family: 'Playfair Display', serif;
-            font-size: 66px;
-            /* Reduced from 82px to be more proportionate */
+            font-size: 46px;
+            /* Reduced from 54px */
             font-weight: 500;
             color: var(--rea-navy-dark);
-            margin: 0 0 25px 0;
-            line-height: 1;
+            margin: 0 0 20px 0;
+            line-height: 1.1;
             letter-spacing: -1.5px;
             position: relative;
         }
@@ -247,6 +348,8 @@
             align-items: flex-end;
             margin-top: auto;
             padding-top: 35px;
+            position: relative;
+            z-index: 10;
         }
 
         .footer-left {
@@ -363,13 +466,19 @@
 </head>
 
 <body>
-    <div class="certificate-wrapper">
-        <!-- Pure Soft Ethereal Glowing Gradients -->
+    <div class="certificate-wrapper theme-completion">
+        <!-- Fresh Soft Ethereal Aurora Glowing Gradients & Patterns -->
         <div class="ethereal-glow-1"></div>
         <div class="ethereal-glow-2"></div>
+        <div class="ethereal-glow-3"></div>
 
         <!-- Glassmorphism Floating Card Container -->
         <div class="inner-frame">
+            <!-- Exclusive double-lined minimalist inner border -->
+            <div class="elegant-inner-border"></div>
+
+            <div class="inner-pattern-bg"></div>
+            <img src="../assets/Logo REA (black).png" alt="" class="watermark-logo">
 
             <!-- Header -->
             <div class="top-nav">
@@ -380,7 +489,7 @@
                 </div>
                 <div class="cert-id-block">
                     <div class="cert-id-label">Credential ID</div>
-                    <div class="cert-id-val">REA/28022026/S1/001</div>
+                    <div class="cert-id-val">REA/28022026/S1/002</div>
                 </div>
             </div>
 
@@ -391,7 +500,7 @@
                     <span>IS PROUDLY AWARDED TO</span>
                 </div>
 
-                <h2 class="recipient-name">Mareta Ayu Handanari</h2>
+                <h2 class="recipient-name">Budi Pratama</h2>
 
                 <div class="description">
                     For demonstrating strong commitment and successfully fulfilling the attendance requirements throughout the sessions, thereby earning the status of <span class="status status-passed">PASSED</span> in the following program:

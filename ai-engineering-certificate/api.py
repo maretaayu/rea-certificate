@@ -89,14 +89,17 @@ def generate_cert(nama: str, sesi: str, urutan: str, status: str = "PASSED", bat
     if status.upper() == "BEST STUDENT":
         css_class = "status-best"
         cert_type = "CERTIFICATE OF EXCELLENCE"
+        theme_class = "theme-excellence"
         description = f'For demonstrating exceptional dedication, fulfilling all comprehensive curriculum requirements, and successfully delivering an outstanding final project, thereby earning the status of <span class="status {css_class}">{status.upper()}</span> in the following program:'
     else:
         css_class = "status-passed"
         cert_type = "CERTIFICATE OF COMPLETION"
+        theme_class = "theme-completion"
         description = f'For demonstrating strong commitment and successfully fulfilling the attendance requirements throughout the sessions, thereby earning the status of <span class="status {css_class}">{status.upper()}</span> in the following program:'
         
     html_content = html_content.replace("{{STATUS_CLASS}}", css_class)
     html_content = html_content.replace("{{CERT_TYPE}}", cert_type)
+    html_content = html_content.replace("{{THEME_CLASS}}", theme_class)
     html_content = html_content.replace("{{DESCRIPTION_HTML}}", description)
     
     # Batch Replace
