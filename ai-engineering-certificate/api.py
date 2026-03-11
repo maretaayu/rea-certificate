@@ -80,14 +80,21 @@ def generate_cert(nama: str, sesi: str, urutan: str, status: str = "PASSED", bat
 
     # Render Template
     html_content = html_content.replace("{{NAMA}}", nama)
-    html_content = html_content.replace("{{TOPIK}}", topik)
     html_content = html_content.replace("{{TANGGAL}}", cert_date)
     html_content = html_content.replace("{{NO_SERTIFIKAT}}", no_sertifikat)
     
     # Status styling
     html_content = html_content.replace("{{STATUS}}", status.upper())
-    css_class = "status-best" if status.upper() == "BEST STUDENT" else "status-passed"
+    
+    if status.upper() == "BEST STUDENT":
+        css_class = "status-best"
+        cert_type = "CERTIFICATE OF EXCELLENCE"
+    else:
+        css_class = "status-passed"
+        cert_type = "CERTIFICATE OF COMPLETION"
+        
     html_content = html_content.replace("{{STATUS_CLASS}}", css_class)
+    html_content = html_content.replace("{{CERT_TYPE}}", cert_type)
     
     # Batch Replace
     html_content = html_content.replace("{{BATCH}}", batch)
