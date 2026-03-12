@@ -18,7 +18,7 @@ SESSIONS = {
     },
     "S2": {
         "event_date_no": "07032026",
-        "cert_date": "Jakarta, 14 Maret 2026",
+        "cert_date": "Jakarta, 12 Maret 2026",
         "topic": "Practical AI Automation with N8N\nfor Real-World Workflows"
     },
     "S3": {
