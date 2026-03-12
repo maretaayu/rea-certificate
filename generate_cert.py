@@ -23,7 +23,7 @@ SESSIONS = {
     },
     "S3": {
         "event_date_no": "14032026",
-        "cert_date": "Jakarta, 21 Maret 2026",
+        "cert_date": "Jakarta, 14 Maret 2026",
         "topic": "Vibe Coding: From Zero to End-to-End\nFull-Stack Application with AI"
     }
 }
