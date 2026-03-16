@@ -1,0 +1,132 @@
+{
+    "name": "REA Certificate Generator via API",
+    "nodes": [
+        {
+            "parameters": {
+                "pollTimes": {
+                    "item": [
+                        {
+                            "mode": "everyMinute"
+                        }
+                    ]
+                },
+                "documentId": {
+                    "__rl": true,
+                    "value": "",
+                    "mode": "id"
+                },
+                "sheetName": {
+                    "__rl": true,
+                    "value": "",
+                    "mode": "name"
+                },
+                "options": {}
+            },
+            "id": "1",
+            "name": "Google Sheets Trigger",
+            "type": "n8n-nodes-base.googleSheetsTrigger",
+            "typeVersion": 1,
+            "position": [
+                380,
+                240
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://rea-certificate-npyydycan-maretas-projects.vercel.app/generate_cert",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "nama",
+                            "value": "={{ $json['Nama Lengkap'] }}"
+                        },
+                        {
+                            "name": "sesi",
+                            "value": "S1"
+                        },
+                        {
+                            "name": "urutan",
+                            "value": "001"
+                        }
+                    ]
+                },
+                "options": {
+                    "response": {
+                        "response": {
+                            "responseFormat": "file",
+                            "outputPropertyName": "data"
+                        }
+                    }
+                }
+            },
+            "id": "2",
+            "name": "Generate Certificate (HTTP Request)",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                600,
+                240
+            ]
+        },
+        {
+            "parameters": {
+                "sendTo": "={{ $json.Email }}",
+                "subject": "Sertifikat Webinar REA - Koding Kurma",
+                "message": "Halo, ini sertifikatmu terlampir.",
+                "appendAttribution": false,
+                "options": {
+                    "attachments": [
+                        {
+                            "propertyName": "data"
+                        }
+                    ]
+                }
+            },
+            "id": "3",
+            "name": "Send Email",
+            "type": "n8n-nodes-base.gmail",
+            "typeVersion": 2.1,
+            "position": [
+                820,
+                240
+            ]
+        }
+    ],
+    "pinData": {},
+    "connections": {
+        "Google Sheets Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Generate Certificate (HTTP Request)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Generate Certificate (HTTP Request)": {
+            "main": [
+                [
+                    {
+                        "node": "Send Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "versionId": "df1bc5ba-2746-4b6e-bd38-164478d1f7be",
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "random"
+    },
+    "id": "n8n-rea-cert",
+    "tags": []
+}

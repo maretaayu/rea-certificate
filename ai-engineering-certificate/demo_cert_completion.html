@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Muhammad Bagoes Anargiansyah</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* REA Soft Blue & Navy Palette */
+            --rea-navy-dark: #0F172A;
+            --rea-navy-light: #1E293B;
+            --rea-blue-primary: #0284C7;
+            --rea-blue-soft: #E0F2FE;
+            --rea-blue-ultra-soft: #F0F9FF;
+
+            --text-body: #475569;
+            --text-muted: #94A3B8;
+        }
+
+        /* Certificate Themes */
+        .theme-excellence {
+            --bg-gradient-1: #E0F2FE;
+            --bg-gradient-2: #BAE6FD;
+            --bg-gradient-3: #F0F9FF;
+            --glow-1: rgba(2, 132, 199, 0.1);
+            --glow-2: rgba(14, 165, 233, 0.08);
+            --glow-3: rgba(56, 189, 248, 0.05);
+            --pattern-1: rgba(2, 132, 199, 0.03);
+            --pattern-2: rgba(2, 132, 199, 0.02);
+            --text-grad-1: #0284C7;
+            --text-grad-2: #0369A1;
+        }
+
+        .theme-completion {
+            /* Synchronized with Excellence Theme (REA Blue) */
+            --bg-gradient-1: #E0F2FE;
+            --bg-gradient-2: #BAE6FD;
+            --bg-gradient-3: #F0F9FF;
+            --glow-1: rgba(2, 132, 199, 0.1);
+            --glow-2: rgba(14, 165, 233, 0.08);
+            --glow-3: rgba(56, 189, 248, 0.05);
+            --pattern-1: rgba(2, 132, 199, 0.03);
+            --pattern-2: rgba(2, 132, 199, 0.02);
+            --text-grad-1: #0284C7;
+            --text-grad-2: #0369A1;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #E2E8F0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 
+         * ORGANIC LUXURY DESIGN
+         * Soft, sweeping "REA Blue" gradients with a pristine glass-like frosted inner frame.
+         * Zero rigid geometric shapes, zero corporate lines, zero classic roman borders.
+         * Extremely aesthetic and breathable whitespace.
+         */
+        .certificate-wrapper {
+            position: relative;
+            width: 1200px;
+            height: 848px;
+            background-color: #FFFFFF;
+            /* Beautiful overlapping soft gradients that adapt to the active theme */
+            background-image:
+                radial-gradient(circle at 100% 0%, var(--bg-gradient-1) 0%, rgba(255, 255, 255, 0) 50%),
+                radial-gradient(circle at 0% 100%, var(--bg-gradient-2) 0%, rgba(255, 255, 255, 0) 60%),
+                radial-gradient(circle at 0% 0%, var(--bg-gradient-3) 0%, rgba(255, 255, 255, 0) 40%);
+            box-shadow: 0 30px 80px -20px rgba(15, 23, 42, 0.15);
+            display: flex;
+            padding: 45px;
+            /* Spacing for the outer canvas */
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* Fresh, vibrant ethereal aurora glows */
+        .ethereal-glow-1 {
+            position: absolute;
+            top: -150px;
+            right: -100px;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, var(--glow-1) 0%, transparent 70%);
+            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .ethereal-glow-2 {
+            position: absolute;
+            bottom: -200px;
+            left: -150px;
+            width: 900px;
+            height: 900px;
+            background: radial-gradient(circle, var(--glow-2) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .ethereal-glow-3 {
+            position: absolute;
+            top: 20%;
+            left: 30%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--glow-3) 0%, transparent 60%);
+            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Ambient interwoven precise pattern */
+        .inner-pattern-bg {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--pattern-1) 1px, transparent 1px),
+                linear-gradient(90deg, var(--pattern-1) 1px, transparent 1px),
+                linear-gradient(45deg, var(--pattern-2) 1px, transparent 1px),
+                linear-gradient(-45deg, var(--pattern-2) 1px, transparent 1px);
+            background-size: 40px 40px, 40px 40px, 28px 28px, 28px 28px;
+            background-position: -1px -1px, -1px -1px, 0 0, 0 0;
+            border-radius: 20px;
+            mask-image: radial-gradient(circle at 100% 100%, black 10%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at 100% 100%, black 10%, transparent 80%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .watermark-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            opacity: 0.03;
+            z-index: 1;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+
+        /* The minimalist floating frosted card */
+        .inner-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            /* Frosted glass effect */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            /* Single delicate hairline border */
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow:
+                inset 0 0 0 1px rgba(2, 132, 199, 0.05),
+                0 10px 40px -10px rgba(2, 132, 199, 0.05);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            padding: 65px 90px;
+            box-sizing: border-box;
+        }
+
+        /* Minimalist Exclusive Frame Border */
+        .elegant-inner-border {
+            position: absolute;
+            inset: 25px;
+            border: 2px solid var(--rea-navy-light);
+            opacity: 0.25;
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .elegant-inner-border::before {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border: 1px solid var(--rea-navy-light);
+            border-radius: 6px;
+        }
+
+        /* Header Layout */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 70px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .brand-logos {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .brand-logo-rea {
+            height: 55px;
+            object-fit: contain;
+        }
+
+        .brand-logo-sa {
+            height: 36px;
+            object-fit: contain;
+        }
+
+        .brand-logo-separator {
+            width: 1px;
+            height: 40px;
+            background-color: rgba(2, 132, 199, 0.2);
+        }
+
+        .cert-id-block {
+            text-align: right;
+        }
+
+        .cert-id-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .cert-id-val {
+            font-family: 'Plus Jakarta Sans', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--rea-navy-light);
+            background: #FFFFFF;
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(2, 132, 199, 0.08);
+        }
+
+        /* Main Typography Body */
+        .main-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            z-index: 10;
+        }
+
+        .awarded-to {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        .cert-type-text {
+            background: linear-gradient(135deg, var(--text-grad-1) 0%, var(--text-grad-2) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+            letter-spacing: 5px;
+            margin-right: 12px;
+        }
+
+        .recipient-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 46px;
+            /* Reduced from 54px */
+            font-weight: 500;
+            color: var(--rea-navy-dark);
+            margin: 0 0 20px 0;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            position: relative;
+        }
+
+        .description {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-body);
+            max-width: 800px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        /* Dynamic Status Styling */
+        .status {
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .status-passed {
+            color: var(--rea-navy-dark);
+        }
+
+        .status-best {
+            color: var(--rea-navy-dark);
+        }
+
+        .program-block {
+            margin-top: 15px;
+        }
+
+        .program-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-style: italic;
+            font-weight: 500;
+            color: var(--rea-navy-dark);
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        /* Footer */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: auto;
+            padding-top: 35px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .date-issue {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--rea-navy-dark);
+        }
+
+        .date-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 6px;
+        }
+
+        .verify-info {
+            font-size: 11px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            max-width: 350px;
+        }
+
+        .verify-link {
+            font-weight: 600;
+            color: var(--rea-blue-primary);
+            text-decoration: none;
+        }
+
+        .signature-block {
+            position: relative;
+            width: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Center align for better visual balance */
+            text-align: center;
+        }
+
+        .stamp-img {
+            position: absolute;
+            left: 5px;
+            /* Stick stamp to left */
+            bottom: 35px;
+            width: 135px;
+            height: auto;
+            opacity: 0.55;
+            mix-blend-mode: multiply;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .signature-real-img {
+            height: 105px;
+            width: auto;
+            object-fit: contain;
+            z-index: 2;
+            position: relative;
+            margin-bottom: -15px;
+            margin-left: 35px;
+            /* Offset signature slightly right to overlap smoothly */
+        }
+
+        .signer-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--rea-navy-dark);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 0;
+            padding-top: 15px;
+            border-top: 1px solid rgba(15, 23, 42, 0.15);
+            width: 100%;
+            z-index: 3;
+            position: relative;
+        }
+
+        .signer-title {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-body);
+            margin: 4px 0 0 0;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .certificate-wrapper {
+                box-shadow: none;
+                width: 100%;
+                height: 100vh;
+                padding: 0;
+            }
+
+            .inner-frame {
+                box-shadow: none;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="certificate-wrapper theme-completion">
+        <!-- Fresh Soft Ethereal Aurora Glowing Gradients & Patterns -->
+        <div class="ethereal-glow-1"></div>
+        <div class="ethereal-glow-2"></div>
+        <div class="ethereal-glow-3"></div>
+
+        <!-- Glassmorphism Floating Card Container -->
+        <div class="inner-frame">
+            <!-- Exclusive double-lined minimalist inner border -->
+            <div class="elegant-inner-border"></div>
+
+            <div class="inner-pattern-bg"></div>
+            <img src="../assets/Logo REA (black).png" alt="" class="watermark-logo">
+
+            <!-- Header -->
+            <div class="top-nav">
+                <div class="brand-logos">
+                    <img src="../assets/Logo REA (black).png" alt="REA" class="brand-logo-rea">
+                    <div class="brand-logo-separator"></div>
+                    <img src="../assets/Logo SA Pro (black).png" alt="SA Pro" class="brand-logo-sa">
+                </div>
+                <div class="cert-id-block">
+                    <div class="cert-id-label">Credential ID</div>
+                    <div class="cert-id-val">REA/28022026/S1/002</div>
+                </div>
+            </div>
+
+            <!-- Main Content Layer -->
+            <div class="main-body">
+                <div class="awarded-to">
+                    <span class="cert-type-text">CERTIFICATE OF COMPLETION</span>
+                    <span>IS PROUDLY AWARDED TO</span>
+                </div>
+
+                <h2 class="recipient-name">Muhammad Bagoes Anargiansyah</h2>
+
+                <div class="description">
+                    For demonstrating strong commitment and successfully fulfilling the attendance requirements throughout the sessions, thereby earning the status of <span class="status status-passed">PASSED</span> in the following program:
+                </div>
+
+                <div class="program-block">
+                    <h3 class="program-name">AI Engineering Bootcamp Batch 9</h3>
+                </div>
+            </div>
+
+            <!-- Footer Layer -->
+            <div class="footer">
+                <div class="footer-left">
+                    <div>
+                        <div class="date-issue">Jakarta, 7 Maret 2026</div>
+                        <div class="date-label">Date of Issuance</div>
+                    </div>
+                    <div class="verify-info">
+                        This credential verifies the individual's participation and successful completion of the boot
+                        camp.<br>
+                        Verify authenticity at <a href="#" class="verify-link">skillacademy.com/verify</a>
+                    </div>
+                </div>
+
+                <div class="signature-block">
+                    <img src="../assets/cap-rg.png" alt="Ruangguru Stamp" class="stamp-img">
+                    <img src="../assets/TTD dan Cap-01.png" alt="Alvin Tamie Signature" class="signature-real-img">
+
+                    <p class="signer-name">Alvin Francis Tamie</p>
+                    <p class="signer-title">Chief Technology Officer, Ruangguru</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,5 +1,4 @@
 fastapi
 pydantic
+Pillow
 uvicorn
-jinja2
-python-multipart
