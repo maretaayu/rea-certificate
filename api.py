@@ -126,16 +126,16 @@ def draw_cert_image(
     color_cert = "#0284c7" # Light Blue untuk Cert ID (karena background putih)
     
     # 1. Gambar Nama (estimasi posisi)
-    name_pos = (260, 640)
+    name_pos = (260, 760)
     draw.text(name_pos, name, font=font_name, fill=color_name)
 
     # 2. Gambar Deskripsi yang dibungkus otomatis
     desc_wrapped = textwrap.fill(desc, width=90)
-    desc_pos = (265, 800)
+    desc_pos = (265, 930)
     draw.multiline_text(desc_pos, desc_wrapped, font=font_desc, fill=color_desc, spacing=15)
 
     # 3. Gambar Credential ID
-    cert_id_pos = (1960, 410)
+    cert_id_pos = (1950, 500)
     draw.text(cert_id_pos, cert_id, font=font_cert_id, fill=color_cert)
 
     # Export ke Bytes
