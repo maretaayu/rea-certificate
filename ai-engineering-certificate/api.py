@@ -1,5 +1,5 @@
 """
-REA AI Engineering Certificate API
+REA AI Engineering Certificate API (Pillow Version)
 ====================================
 Endpoint untuk n8n via HTTP Request node.
 
@@ -15,44 +15,44 @@ POST /generate_cert
     }
 
   Response:
-    PDF binary (Content-Type: application/pdf)
+    PNG binary (Content-Type: image/png)
     Header X-Cert-ID: REAENG10XXXXX
-
-GET /health  →  health check
 """
 
 import os
 import io
-import re
 import random
 import string
-import tempfile
+import textwrap
 from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
 
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional
-from playwright.sync_api import sync_playwright
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 BASE_DIR       = Path(os.path.dirname(os.path.abspath(__file__)))
-TEMPLATE_PATH  = BASE_DIR / "index.html"
 BATCH          = "10"
-ISSUANCE       = "Jakarta, 23 Maret 2026"
+ASSETS_DIR     = BASE_DIR / "assets"
+TEMPLATE_COC   = ASSETS_DIR / "template_coc_blank.png"
+TEMPLATE_COE   = ASSETS_DIR / "template_coe_blank.png"
 
-CDN = {
-    "logo_rea" : "https://cdn-web.ruangguru.com/file-uploader/4791f896-8bc7-41d4-9c58-67c9c4054477.png",
-    "logo_sa"  : "https://cdn-web.ruangguru.com/file-uploader/a287e3f7-3d52-477e-826b-80789f3d9861.png",
-    "signature": "https://cdn-web.ruangguru.com/file-uploader/cd39c2fc-e6b9-4841-9f85-e55edabc8702.png",
-    "stamp"    : "https://cdn-web.ruangguru.com/file-uploader/3658b378-4a25-4f95-926e-6fbd9a28ce3a.png",
-}
+FONT_PATH      = str(BASE_DIR.parent / "Roboto-Bold.ttf")
+
+try:
+    font_name    = ImageFont.truetype(FONT_PATH, 110)
+    font_desc    = ImageFont.truetype(FONT_PATH, 38)
+    font_cert_id = ImageFont.truetype(FONT_PATH, 32)
+except Exception:
+    font_name = font_desc = font_cert_id = ImageFont.load_default()
 
 # ─── APP ──────────────────────────────────────────────────────────────────────
 app = FastAPI(
     title       = "REA Certificate API",
-    description = "Generate PDF certificates for AI Engineering Bootcamp Batch 10",
-    version     = "2.0.0",
+    description = "Generate PNG certificates for AI Engineering Bootcamp Batch 10 via PIL (Vercel Serverless)",
+    version     = "3.0.0",
 )
 
 app.add_middleware(
@@ -66,16 +66,15 @@ app.add_middleware(
 class CertRequest(BaseModel):
     name          : str
     student_id    : str
-    atc_accum     : str             = "0%"   # e.g. "93%"
-    current_score : float           = 0      # e.g. 89
-    current_grade : str             = ""     # e.g. "A"
-    cert_type     : Optional[str]   = None   # "COC" | "COE" | "BEST" (auto if None)
+    atc_accum     : str             = "0%"
+    current_score : float           = 0
+    current_grade : str             = ""
+    cert_type     : Optional[str]   = None
     batch         : str             = BATCH
-    issuance_date : str             = ISSUANCE
 
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
 def pct_to_float(val: str) -> float:
-    val = val.strip()
+    val = str(val).strip()
     if val.endswith('%'):
         return float(val[:-1])
     try:
@@ -83,148 +82,108 @@ def pct_to_float(val: str) -> float:
     except ValueError:
         return 0.0
 
-
 def make_cert_id(batch: str) -> str:
     chars = string.ascii_uppercase + string.digits
     return f"REAENG{batch}" + ''.join(random.choices(chars, k=5))
 
-
-def load_template() -> str:
-    with open(TEMPLATE_PATH, encoding='utf-8') as f:
-        return f.read()
-
-
-def render_cert(
-    cert_type_label : str,   # "COC" | "COE" | "BEST"
-    name            : str,
-    cert_id         : str,
-    atc_str         : str,
-    score           : float,
-    grade           : str,
-    batch           : str,
-    issuance_date   : str,
-) -> str:
-    template = load_template()
-
+def draw_cert_image(
+    cert_type_label: str,
+    name: str,
+    cert_id: str,
+    atc_str: str,
+    score: float,
+    grade: str
+) -> bytes:
+    
     if cert_type_label == "BEST":
-        theme       = "theme-excellence"
-        cert_type   = "CERTIFICATE OF EXCELLENCE"
-        description = (
-            'For demonstrating exceptional dedication, fulfilling all comprehensive curriculum requirements, and '
-            'successfully delivering an outstanding final project, thereby earning the status of '
-            '<span class="status status-best">BEST STUDENT</span> in the following program:'
+        img_path = TEMPLATE_COE
+        desc = (
+            f"For demonstrating exceptional dedication, fulfilling all comprehensive curriculum requirements, "
+            f"and successfully delivering an outstanding final project, thereby earning the status of "
+            f"BEST STUDENT in the following program:"
         )
     elif cert_type_label == "COE":
-        theme       = "theme-excellence"
-        cert_type   = "CERTIFICATE OF EXCELLENCE"
-        description = (
-            f'For demonstrating exceptional dedication and successfully fulfilling all curriculum requirements '
-            f'with a score of <span class="status status-best">{int(score)}</span>, '
-            f'thereby earning the grade of <span class="status status-best">{grade}</span> in the following program:'
+        img_path = TEMPLATE_COE
+        desc = (
+            f"For demonstrating exceptional dedication and successfully fulfilling all curriculum requirements "
+            f"with a score of {int(score)}, thereby earning the grade of {grade} in the following program:"
         )
     else:  # COC
-        theme       = "theme-completion"
-        cert_type   = "CERTIFICATE OF COMPLETION"
-        description = (
-            f'For demonstrating strong commitment and successfully fulfilling the attendance requirements '
-            f'with an accumulation score of <span class="status status-passed">{atc_str}</span> throughout the sessions, '
-            f'thereby earning the status of <span class="status status-passed">PASSED</span> in the following program:'
+        img_path = TEMPLATE_COC
+        desc = (
+            f"For demonstrating strong commitment and successfully fulfilling the attendance requirements "
+            f"with an accumulation score of {atc_str} throughout the sessions, thereby earning the status "
+            f"of PASSED in the following program:"
         )
 
-    html = template
-    html = html.replace('{{THEME_CLASS}}',      theme)
-    html = html.replace('{{CERT_TYPE}}',        cert_type)
-    html = html.replace('{{NAMA}}',             name)
-    html = html.replace('{{DESCRIPTION_HTML}}', description)
-    html = html.replace('{{BATCH}}',            batch)
-    html = html.replace('{{TANGGAL}}',          issuance_date)
-    html = html.replace('{{NO_SERTIFIKAT}}',    cert_id)
-    return html
+    # Buka gambar template
+    img = Image.open(img_path).convert("RGB")
+    draw = ImageDraw.Draw(img)
 
+    # Warna
+    color_name = "#1e293b" # Slate-800
+    color_desc = "#334155" # Slate-700
+    color_cert = "#0284c7" # Light Blue untuk Cert ID (karena background putih)
+    
+    # 1. Gambar Nama (estimasi posisi)
+    name_pos = (260, 640)
+    draw.text(name_pos, name, font=font_name, fill=color_name)
 
-def html_to_pdf_bytes(html: str) -> bytes:
-    """Write HTML to temp file, render via Playwright, return PDF bytes."""
-    with tempfile.NamedTemporaryFile(suffix='.html', delete=False, mode='w', encoding='utf-8') as f:
-        f.write(html)
-        tmp_path = Path(f.name)
+    # 2. Gambar Deskripsi yang dibungkus otomatis
+    desc_wrapped = textwrap.fill(desc, width=90)
+    desc_pos = (265, 800)
+    draw.multiline_text(desc_pos, desc_wrapped, font=font_desc, fill=color_desc, spacing=15)
 
-    try:
-        with sync_playwright() as p:
-            browser = p.chromium.launch()
-            page = browser.new_page(viewport={'width': 1200, 'height': 848})
-            page.goto(tmp_path.resolve().as_uri())
-            page.wait_for_load_state('networkidle')
-            pdf_bytes = page.pdf(
-                format='A4',
-                landscape=True,
-                print_background=True,
-                margin={'top': '0', 'right': '0', 'bottom': '0', 'left': '0'},
-            )
-            browser.close()
-        return pdf_bytes
-    finally:
-        tmp_path.unlink(missing_ok=True)
+    # 3. Gambar Credential ID
+    cert_id_pos = (1960, 410)
+    draw.text(cert_id_pos, cert_id, font=font_cert_id, fill=color_cert)
+
+    # Export ke Bytes
+    buf = io.BytesIO()
+    img.save(buf, format="PNG", quality=95)
+    buf.seek(0)
+    return buf.read()
 
 
 # ─── ROUTES ───────────────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
-    return {"status": "ok", "batch": BATCH}
+    return {"status": "ok", "mode": "Pillow (PNG)"}
 
 
 @app.post("/generate_cert")
 def generate_cert(req: CertRequest):
-    """
-    Generate a certificate PDF.
-
-    Auto-detect cert_type if not provided:
-      - "BEST" if current_score == 100 and cert_type == "BEST"
-      - "COE"  if current_score >= 70
-      - "COC"  if atc_accum >= 70%
-
-    Returns PDF binary.
-    """
     atc_val   = pct_to_float(req.atc_accum)
     score_val = float(req.current_score)
-
-    # Determine cert type
     cert_type = (req.cert_type or "").upper()
 
     if cert_type not in ("COC", "COE", "BEST"):
-        # Auto-detect
         if score_val >= 70:
             cert_type = "COE"
         elif atc_val >= 70:
             cert_type = "COC"
         else:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Student tidak memenuhi syarat: Atc={req.atc_accum}, Score={req.current_score}"
-            )
+            raise HTTPException(status_code=400, detail="Student tidak memenuhi syarat")
 
-    # Validate eligibility
     if cert_type == "COE" and score_val < 70:
         raise HTTPException(status_code=400, detail="COE requires Current Score >= 70")
     if cert_type == "COC" and atc_val < 70:
         raise HTTPException(status_code=400, detail="COC requires Atc (Accum) >= 70%")
 
     cert_id  = make_cert_id(req.batch)
-    html     = render_cert(
+    png_bytes = draw_cert_image(
         cert_type_label = cert_type,
         name            = req.name,
         cert_id         = cert_id,
         atc_str         = req.atc_accum,
         score           = score_val,
         grade           = req.current_grade,
-        batch           = req.batch,
-        issuance_date   = req.issuance_date,
     )
-    pdf_bytes = html_to_pdf_bytes(html)
 
-    filename = f"{req.name.replace(' ', '_')}_{cert_type}.pdf"
+    filename = f"{req.name.replace(' ', '_')}_{cert_type}.png"
     return Response(
-        content      = pdf_bytes,
-        media_type   = "application/pdf",
+        content      = png_bytes,
+        media_type   = "image/png",
         headers      = {
             "Content-Disposition": f'attachment; filename="{filename}"',
             "X-Cert-ID"          : cert_id,
