@@ -151,8 +151,9 @@ def health():
     return {"status": "ok", "mode": "Pillow (PNG)"}
 
 
+@app.post("/generate_cert/{filename}")
 @app.post("/generate_cert")
-def generate_cert(req: CertRequest):
+def generate_cert(req: CertRequest, filename: Optional[str] = None, format: Optional[str] = None):
     atc_val   = pct_to_float(req.atc_accum)
     score_val = float(req.current_score)
     cert_type = (req.cert_type or "").upper()
@@ -181,6 +182,19 @@ def generate_cert(req: CertRequest):
     )
 
     filename = f"{req.name.replace(' ', '_')}_{cert_type}.png"
+    if not filename.endswith('.png'):
+        filename += '.png'
+    
+    if format == "json":
+        import base64
+        b64_str = base64.b64encode(png_bytes).decode("utf-8")
+        return {
+            "status": "success",
+            "filename": filename,
+            "cert_id": cert_id,
+            "base64": b64_str
+        }
+
     return Response(
         content      = png_bytes,
         media_type   = "image/png",
