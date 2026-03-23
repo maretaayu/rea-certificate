@@ -1,159 +1,193 @@
-from fastapi import FastAPI, HTTPException, Response
-from pydantic import BaseModel
-from PIL import Image, ImageDraw, ImageFont
+"""
+REA AI Engineering Certificate API (Pillow Version)
+====================================
+Endpoint untuk n8n via HTTP Request node.
+
+POST /generate_cert
+  Body (JSON):
+    {
+      "name"          : "Adrian Ananta",
+      "student_id"    : "REAENG10RDFIR",
+      "atc_accum"     : "100%",          // kolom Atc (Accum)
+      "current_score" : 100,             // kolom Current Score
+      "current_grade" : "A",
+      "cert_type"     : "COC" | "COE" | "BEST"  // opsional, auto-detect jika tidak ada
+    }
+
+  Response:
+    PNG binary (Content-Type: image/png)
+    Header X-Cert-ID: REAENG10XXXXX
+"""
+
 import os
 import io
+import random
+import string
+import textwrap
+from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
 
-app = FastAPI(title="REA Certificate Generator API")
+from fastapi import FastAPI, HTTPException, Response
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional
 
-# Setup Request Body Model yang akan diterima dari n8n
+# ─── CONFIG ───────────────────────────────────────────────────────────────────
+BASE_DIR       = Path(os.path.dirname(os.path.abspath(__file__)))
+BATCH          = "10"
+ASSETS_DIR     = BASE_DIR / "assets"
+TEMPLATE_COC   = ASSETS_DIR / "template_coc_blank.png"
+TEMPLATE_COE   = ASSETS_DIR / "template_coe_blank.png"
+
+FONT_PATH      = str(BASE_DIR / "Roboto-Bold.ttf")
+
+try:
+    font_name    = ImageFont.truetype(FONT_PATH, 110)
+    font_desc    = ImageFont.truetype(FONT_PATH, 38)
+    font_cert_id = ImageFont.truetype(FONT_PATH, 32)
+except Exception:
+    font_name = font_desc = font_cert_id = ImageFont.load_default()
+
+# ─── APP ──────────────────────────────────────────────────────────────────────
+app = FastAPI(
+    title       = "REA Certificate API",
+    description = "Generate PNG certificates for AI Engineering Bootcamp Batch 10 via PIL (Vercel Serverless)",
+    version     = "3.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ─── MODELS ───────────────────────────────────────────────────────────────────
 class CertRequest(BaseModel):
-    nama: str
-    sesi: str     # Contoh: "S1" / "S2" / "S3"
-    urutan: str   # Contoh: "1" / "050" / "073"
+    name          : str
+    student_id    : str
+    atc_accum     : str             = "0%"
+    current_score : float           = 0
+    current_grade : str             = ""
+    cert_type     : Optional[str]   = None
+    batch         : str             = BATCH
 
-# ============== KONFIGURASI ===================
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_PATH = os.path.join(BASE_DIR, "assets", "template_clean.jpg")
-SIGNATURE_PATH_1 = os.path.join(BASE_DIR, "assets", "TTD dan Cap-01.png") # TTD
-SIGNATURE_PATH_2 = os.path.join(BASE_DIR, "assets", "cap-rg.png") # Cap
-FONT_PATH = os.path.join(BASE_DIR, "Roboto-Bold.ttf")
-
-SESSIONS = {
-    "S1": {
-        "event_date_no": "28022026",
-        "cert_date": "Jakarta, 7 Maret 2026",
-        "topic": "Getting Started as an AI Engineer:\nCareer Paths, Portfolios, and Interviews"
-    },
-    "S2": {
-        "event_date_no": "07032026",
-        "cert_date": "Jakarta, 12 Maret 2026",
-        "topic": "Practical AI Automation with N8N\nfor Real-World Workflows"
-    },
-    "S3": {
-        "event_date_no": "14032026",
-        "cert_date": "Jakarta, 14 Maret 2026",
-        "topic": "Vibe Coding: From Zero to End-to-End\nFull-Stack Application with AI"
-    }
-}
-
-POS_NAMA = (1754, 1000)
-POS_TOPIK = (1754, 1460)
-POS_TANGGAL = (1754, 1720)
-POS_NOMOR = (3200, 2330)
-
-FONT_NAMA_SIZE = 120
-FONT_TOPIK_SIZE = 75
-FONT_TANGGAL_SIZE = 60
-FONT_NOMOR_SIZE = 55
-
-FONT_NAMA_COLOR = "#000000"
-FONT_TOPIK_COLOR = "#000000"
-FONT_TEXT_COLOR = "#000000"
-FONT_NOMOR_COLOR = "#000000"
-# ===============================================
-
-def load_fonts():
+# ─── HELPERS ──────────────────────────────────────────────────────────────────
+def pct_to_float(val: str) -> float:
+    val = str(val).strip()
+    if val.endswith('%'):
+        return float(val[:-1])
     try:
-        font_nama = ImageFont.truetype(FONT_PATH, FONT_NAMA_SIZE)
-        font_topik = ImageFont.truetype(FONT_PATH, FONT_TOPIK_SIZE)
-        font_tanggal = ImageFont.truetype(FONT_PATH, FONT_TANGGAL_SIZE)
-        font_nomor = ImageFont.truetype(FONT_PATH, FONT_NOMOR_SIZE)
-        return font_nama, font_topik, font_tanggal, font_nomor
-    except Exception as e:
-        print("Gagal load font:", e)
-        return (ImageFont.load_default(),) * 4
+        return float(val)
+    except ValueError:
+        return 0.0
 
-@app.get("/")
-def home():
-    return {"message": "API Sertifikat REA Running. Gunakan POST /generate_cert"}
+def make_cert_id(batch: str) -> str:
+    chars = string.ascii_uppercase + string.digits
+    return f"REAENG{batch}" + ''.join(random.choices(chars, k=5))
 
-@app.get("/generate_cert")
-def generate_cert(nama: str, sesi: str, urutan: str):
-    # Ekstrak Sesi berdasarkan teks (karena dari G-Form teksnya panjang "Sesi 1 (28 Feb)...")
-    sesi_raw = sesi.upper()
-    if "SESI 1" in sesi_raw:
-        sesi_key = "S1"
-    elif "SESI 2" in sesi_raw:
-        sesi_key = "S2"
-    elif "SESI 3" in sesi_raw:
-        sesi_key = "S3"
-    else:
-        # Fallback kalau format tidak dikenali
-        sesi_key = sesi_raw
-
-    if sesi_key not in SESSIONS:
-        raise HTTPException(status_code=400, detail=f"Sesi '{sesi}' tidak dikenali. Harus mengandung kata 'Sesi 1', 'Sesi 2', atau 'Sesi 3'.")
-
-    # Validasi Template
-    if not os.path.exists(TEMPLATE_PATH):
-        raise HTTPException(status_code=500, detail="Template gambar tidak ditemukan di server.")
-
-    # Data dari request
-    nama = nama.strip()
-    urutan = urutan.strip().zfill(3)
-    sesi_info = SESSIONS[sesi_key]
+def draw_cert_image(
+    cert_type_label: str,
+    name: str,
+    cert_id: str,
+    atc_str: str,
+    score: float,
+    grade: str
+) -> bytes:
     
-    event_date_no = sesi_info["event_date_no"]
-    cert_date = sesi_info["cert_date"]
-    topik = sesi_info["topic"]
+    if cert_type_label == "BEST":
+        img_path = TEMPLATE_COE
+        desc = (
+            f"For demonstrating exceptional dedication, fulfilling all comprehensive curriculum requirements, "
+            f"and successfully delivering an outstanding final project, thereby earning the status of "
+            f"BEST STUDENT in the following program:"
+        )
+    elif cert_type_label == "COE":
+        img_path = TEMPLATE_COE
+        desc = (
+            f"For demonstrating exceptional dedication and successfully fulfilling all curriculum requirements "
+            f"with a score of {int(score)}, thereby earning the grade of {grade} in the following program:"
+        )
+    else:  # COC
+        img_path = TEMPLATE_COC
+        desc = (
+            f"For demonstrating strong commitment and successfully fulfilling the attendance requirements "
+            f"with an accumulation score of {atc_str} throughout the sessions, thereby earning the status "
+            f"of PASSED in the following program:"
+        )
+
+    # Buka gambar template
+    img = Image.open(img_path).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    # Warna
+    color_name = "#1e293b" # Slate-800
+    color_desc = "#334155" # Slate-700
+    color_cert = "#0284c7" # Light Blue untuk Cert ID (karena background putih)
     
-    no_sertifikat = f"REA/{event_date_no}/{sesi_key}/{urutan}"
+    # 1. Gambar Nama (estimasi posisi)
+    name_pos = (260, 640)
+    draw.text(name_pos, name, font=font_name, fill=color_name)
 
-    # Load Template
-    try:
-        base_template = Image.open(TEMPLATE_PATH).convert("RGBA")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gagal memuat template: {str(e)}")
+    # 2. Gambar Deskripsi yang dibungkus otomatis
+    desc_wrapped = textwrap.fill(desc, width=90)
+    desc_pos = (265, 800)
+    draw.multiline_text(desc_pos, desc_wrapped, font=font_desc, fill=color_desc, spacing=15)
 
-    fonts = load_fonts()
+    # 3. Gambar Credential ID
+    cert_id_pos = (1960, 410)
+    draw.text(cert_id_pos, cert_id, font=font_cert_id, fill=color_cert)
 
-    # Buat kanvas gambar
-    temp_image = Image.new("RGBA", base_template.size)
-    temp_image.paste(base_template, (0, 0))
-    draw = ImageDraw.Draw(temp_image)
-
-    # Tulis teks
-    draw.text(POS_NAMA, nama, font=fonts[0], fill=FONT_NAMA_COLOR, anchor="mm")
-    draw.text(POS_TOPIK, topik, font=fonts[1], fill=FONT_TOPIK_COLOR, anchor="mm", align="center")
-    draw.text(POS_TANGGAL, cert_date, font=fonts[2], fill=FONT_TEXT_COLOR, anchor="mm")
-    draw.text(POS_NOMOR, no_sertifikat, font=fonts[3], fill=FONT_NOMOR_COLOR, anchor="mm")
-
-    # Tempel Tandatangan & Cap (Ditumpuk)
-    try:
-        # 1. Tempel Cap (Layer bawah)
-        if os.path.exists(SIGNATURE_PATH_2):
-             cap_img = Image.open(SIGNATURE_PATH_2).convert("RGBA")
-             # Ukuran cap dikurangi sedikit (lebar 320px)
-             w_percent = (320 / float(cap_img.size[0]))
-             h_size = int((float(cap_img.size[1]) * float(w_percent)))
-             cap_img = cap_img.resize((320, h_size), Image.Resampling.LANCZOS)
-             
-             # Digeser sedikit ke Kanan (+50 pixel dari tengah)
-             pos_x = (1754 + 50) - (cap_img.size[0] // 2)
-             pos_y = 1820 # Posisi Y tidak diubah
-             temp_image.paste(cap_img, (pos_x, pos_y), mask=cap_img)
-             
-        # 2. Tempel TTD (Layer atas)
-        if os.path.exists(SIGNATURE_PATH_1):
-             sign_img = Image.open(SIGNATURE_PATH_1).convert("RGBA")
-             w_percent = (450 / float(sign_img.size[0]))
-             h_size = int((float(sign_img.size[1]) * float(w_percent)))
-             sign_img = sign_img.resize((450, h_size), Image.Resampling.LANCZOS)
-             
-             pos_x = 1754 - (sign_img.size[0] // 2)
-             pos_y = 1780 # Koordinat sama persis agar menumpuk sejajar
-             temp_image.paste(sign_img, (pos_x, pos_y), mask=sign_img)
-             
-    except Exception as e:
-        print(f"Gagal paste tanda tangan & cap: {e}")
-
-    # Konversi ke RGB dan simpan ke buffer memori
-    final_image = temp_image.convert("RGB")
+    # Export ke Bytes
     buf = io.BytesIO()
-    final_image.save(buf, format="JPEG", quality=95)
+    img.save(buf, format="PNG", quality=95)
     buf.seek(0)
+    return buf.read()
 
-    # Kembalikan gambar langsung sebagai Response
-    # Di n8n nanti, node HTTP Request otomatis mendownload ini sebagai File Binary
-    return Response(content=buf.getvalue(), media_type="image/jpeg", headers={"Content-Disposition": f'attachment; filename="{no_sertifikat}.jpg"'})
+
+# ─── ROUTES ───────────────────────────────────────────────────────────────────
+@app.get("/health")
+def health():
+    return {"status": "ok", "mode": "Pillow (PNG)"}
+
+
+@app.post("/generate_cert")
+def generate_cert(req: CertRequest):
+    atc_val   = pct_to_float(req.atc_accum)
+    score_val = float(req.current_score)
+    cert_type = (req.cert_type or "").upper()
+
+    if cert_type not in ("COC", "COE", "BEST"):
+        if score_val >= 70:
+            cert_type = "COE"
+        elif atc_val >= 70:
+            cert_type = "COC"
+        else:
+            raise HTTPException(status_code=400, detail="Student tidak memenuhi syarat")
+
+    if cert_type == "COE" and score_val < 70:
+        raise HTTPException(status_code=400, detail="COE requires Current Score >= 70")
+    if cert_type == "COC" and atc_val < 70:
+        raise HTTPException(status_code=400, detail="COC requires Atc (Accum) >= 70%")
+
+    cert_id  = make_cert_id(req.batch)
+    png_bytes = draw_cert_image(
+        cert_type_label = cert_type,
+        name            = req.name,
+        cert_id         = cert_id,
+        atc_str         = req.atc_accum,
+        score           = score_val,
+        grade           = req.current_grade,
+    )
+
+    filename = f"{req.name.replace(' ', '_')}_{cert_type}.png"
+    return Response(
+        content      = png_bytes,
+        media_type   = "image/png",
+        headers      = {
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "X-Cert-ID"          : cert_id,
+            "X-Cert-Type"        : cert_type,
+            "X-Student-Name"     : req.name,
+        }
+    )
