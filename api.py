@@ -39,8 +39,8 @@ ASSETS_DIR     = BASE_DIR / "assets"
 TEMPLATE_COC   = ASSETS_DIR / "template_coc_blank.png"
 TEMPLATE_COE   = ASSETS_DIR / "template_coe_blank.png"
 
-FONT_PATH_BOLD = str(BASE_DIR / "Roboto-Bold.ttf")
-FONT_PATH_REG  = str(BASE_DIR / "Roboto-Regular.ttf")
+FONT_PATH_BOLD = str(BASE_DIR / "PlusJakartaSans-Bold.ttf")
+FONT_PATH_REG  = str(BASE_DIR / "PlusJakartaSans-Regular.ttf")
 
 try:
     font_name    = ImageFont.truetype(FONT_PATH_BOLD, 110)
