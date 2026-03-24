@@ -178,9 +178,15 @@ def draw_cert_image(
     color_desc = "#334155" # Slate-700
     color_cert = "#0284c7" # Light Blue
     
-    # 1. Gambar Nama - (Dikembalikan ke Y=600 biar nempel dan nyambung dengan title Awarded To)
+    # 1. Gambar Nama - auto-scale agar tidak melebihi lebar canvas
+    MAX_NAME_WIDTH = 1800  # px, batas lebar nama di canvas 2480px
+    name_font_size = 110
+    dynamic_font = ImageFont.truetype(FONT_PATH_BOLD, name_font_size)
+    while draw.textlength(name, font=dynamic_font) > MAX_NAME_WIDTH and name_font_size > 60:
+        name_font_size -= 4
+        dynamic_font = ImageFont.truetype(FONT_PATH_BOLD, name_font_size)
     name_pos = (260, 600)
-    draw.text(name_pos, name, font=font_name, fill=color_name)
+    draw.text(name_pos, name, font=dynamic_font, fill=color_name)
 
     # 2. Gambar Deskripsi - (Rich Text dg Bold)
     desc_pos = (265, 780)
