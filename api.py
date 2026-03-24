@@ -259,3 +259,124 @@ def generate_cert(req: CertRequest, filename: Optional[str] = None, format: Opti
             "X-Student-Name"     : req.name,
         }
     )
+
+TEMPLATE_REPORT= ASSETS_DIR / "template_report_blank.png"
+
+class ReportRequest(BaseModel):
+    name          : str
+    student_id    : Union[str, int]
+    batch         : Union[str, int]        = BATCH
+    current_score : Union[str, int, float] = "0"
+    current_grade : Union[str, int, float] = ""
+    current_status: str                    = ""
+    atc_accum     : Union[str, int, float] = "0%"
+    pre_test      : Union[str, int, float] = ""
+    post_test     : Union[str, int, float] = ""
+    fp            : Union[str, int, float] = ""
+    atr1          : Union[str, int, float] = ""
+    prj1          : Union[str, int, float] = ""
+    atr2          : Union[str, int, float] = ""
+    prj2          : Union[str, int, float] = ""
+    atr3          : Union[str, int, float] = ""
+    prj3          : Union[str, int, float] = ""
+    atr4          : Union[str, int, float] = ""
+    prj4          : Union[str, int, float] = ""
+    atr5          : Union[str, int, float] = ""
+    atr6          : Union[str, int, float] = ""
+    atr7          : Union[str, int, float] = ""
+
+# ─── REPORT IMAGE (Vercel Native Pillow) ──────────────────────────────────────
+try:
+    from PIL import ImageColor
+    font_rpt_name  = ImageFont.truetype(FONT_PATH_BOLD, 28)
+    font_rpt_val   = ImageFont.truetype(FONT_PATH_BOLD, 26)
+    font_rpt_score = ImageFont.truetype(FONT_PATH_BOLD, 42)
+    font_rpt_small = ImageFont.truetype(FONT_PATH_REG, 22)
+except Exception:
+    font_rpt_name = font_rpt_val = font_rpt_score = font_rpt_small = ImageFont.load_default()
+
+def draw_report_image(req: ReportRequest) -> bytes:
+    img  = Image.open(TEMPLATE_REPORT).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    navy  = "#0A192F"
+    blue  = "#0284C7"
+    muted = "#94A3B8"
+
+    # Row 1: Name, Student ID
+    draw.text((510, 478), str(req.name),          font=font_rpt_name,  fill=navy, anchor="lm")
+    draw.text((1478, 478), str(req.student_id),   font=font_rpt_val,   fill=navy, anchor="lm")
+    # Row 2: Program, Current Score
+    draw.text((510, 604),  f"AI Engineering Bootcamp Batch {req.batch}", font=font_rpt_small, fill=navy, anchor="lm")
+    draw.text((1478, 614), str(req.current_score), font=font_rpt_score, fill=blue, anchor="lm")
+    # Row 3: Grade
+    draw.text((510, 748),  str(req.current_grade), font=font_rpt_name,  fill=navy, anchor="lm")
+    
+    status_str = str(req.current_status).upper()
+    status_color_map = {
+        "PASSED":           ("#DCFCE7", "#166534"),
+        "REMEDIAL":         ("#FFEDD5", "#C2410C"),
+        "NEED IMPROVEMENT": ("#FEF9C3", "#854D0E"),
+        "FAILED":           ("#FEE2E2", "#991B1B"),
+    }
+    bg_hex, fg_hex = status_color_map.get(status_str, ("#E0F2FE", "#0369A1"))
+    
+    pill_x, pill_y, pill_h, pill_pad_x = 994, 734, 36, 20
+    bbox = draw.textbbox((0, 0), status_str, font=font_rpt_small)
+    pill_w = bbox[2] - bbox[0] + pill_pad_x * 2
+    from PIL import ImageColor
+    bg_rgb = ImageColor.getrgb(bg_hex)
+    fg_rgb = ImageColor.getrgb(fg_hex)
+    draw.rounded_rectangle([pill_x, pill_y, pill_x + pill_w, pill_y + pill_h], radius=pill_h // 2, fill=bg_rgb)
+    draw.text((pill_x + pill_pad_x, pill_y + pill_h // 2), status_str, font=font_rpt_small, fill=fg_rgb, anchor="lm")
+
+    # Attendance & Project
+    atr_cx, prj_cx = 1384, 1737
+    def fv(v): 
+        s = str(v).strip()
+        if not s or s in ('', '-1', '-', '—'): return '—'
+        try:
+            fl = float(s)
+            return '—' if fl < 0 else (str(int(fl)) if fl == int(fl) else s)
+        except: return s
+
+    courses = [
+        (str(req.atr1), fv(req.prj1)), (str(req.atr2), fv(req.prj2)), (str(req.atr3), fv(req.prj3)),
+        (str(req.atr4), fv(req.prj4)), (str(req.atr5), '—'), (str(req.atr6), '—'), (str(req.atr7), '—'),
+    ]
+    for (atr, prj), cy in zip(courses, [1052, 1126, 1200, 1274, 1348, 1422, 1496]):
+        draw.text((atr_cx, cy), atr, font=font_rpt_small, fill=navy, anchor="mm")
+        draw.text((prj_cx, cy), prj, font=font_rpt_small, fill=muted if prj == '—' else navy, anchor="mm")
+
+    # Score Recap
+    score_cx = 1083
+    for cy, val in [(1763, fv(req.pre_test)), (1827, fv(req.post_test)), (1891, str(req.atc_accum)), (1954, fv(req.fp))]:
+        draw.text((score_cx, cy), val, font=font_rpt_small, fill=muted if val == "—" else navy, anchor="mm")
+
+    buf = io.BytesIO()
+    img.save(buf, format="PNG", quality=95)
+    buf.seek(0)
+    return buf.read()
+
+
+@app.post("/generate_report")
+def generate_report(req: ReportRequest, format: Optional[str] = None):
+    try:
+        png_bytes = draw_report_image(req)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    filename  = f"{str(req.name).replace(' ', '_')}_Report.png"
+
+    if format == "json":
+        import base64
+        return {
+            "status"  : "success",
+            "filename": filename,
+            "base64"  : base64.b64encode(png_bytes).decode("utf-8"),
+        }
+
+    return Response(
+        content    = png_bytes,
+        media_type = "image/png",
+        headers    = {"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
