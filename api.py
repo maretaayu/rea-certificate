@@ -179,7 +179,7 @@ def draw_cert_image(
     color_cert = "#0284c7" # Light Blue
     
     # 1. Gambar Nama - ukuran fixed 80px untuk semua nama
-    name_pos = (260, 600)
+    name_pos = (260, 620)
     draw.text(name_pos, name, font=font_name, fill=color_name)
 
     # 2. Gambar Deskripsi - (Rich Text dg Bold)
