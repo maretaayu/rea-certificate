@@ -67,7 +67,7 @@ class CertRequest(BaseModel):
     name          : str
     student_id    : str
     atc_accum     : str             = "0%"
-    current_score : float           = 0
+    current_score : str             = "0"
     current_grade : str             = ""
     cert_type     : Optional[str]   = None
     batch         : str             = BATCH
@@ -77,6 +77,15 @@ def pct_to_float(val: str) -> float:
     val = str(val).strip()
     if val.endswith('%'):
         return float(val[:-1])
+    try:
+        f = float(val)
+        if 0 < f <= 1.0:
+            return f * 100
+        return f
+    except ValueError:
+        return 0.0
+
+def safe_float(val: str) -> float:
     try:
         return float(val)
     except ValueError:
@@ -154,7 +163,7 @@ def health():
 @app.post("/generate_cert")
 def generate_cert(req: CertRequest):
     atc_val   = pct_to_float(req.atc_accum)
-    score_val = float(req.current_score)
+    score_val = safe_float(req.current_score)
     cert_type = (req.cert_type or "").upper()
 
     if cert_type not in ("COC", "COE", "BEST"):
