@@ -4,483 +4,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Report - {{NAMA}}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
-        rel="stylesheet">
+    <title>Student Report - {{NAME}}</title>
     <style>
-        :root {
-            --rea-navy-dark: #0A192F;
-            --rea-blue-primary: #0284C7;
-            --rea-blue-soft: #E0F2FE;
-            --rea-blue-ultrasoft: #F0F9FF;
-            --surface-bg: #F8FAFC;
-            --border-color: #E2E8F0;
-            --text-main: #1E293B;
-            --text-body: #475569;
-            --text-muted: #94A3B8;
-
-            /* Status Colors */
-            --success-bg: #DCFCE7;
-            --success-text: #166534;
-            --warning-bg: #FEF9C3;
-            --warning-text: #854D0E;
-            --danger-bg: #FEE2E2;
-            --danger-text: #991B1B;
+        @font-face {
+            font-family: 'Plus Jakarta Sans';
+            src: url('../PlusJakartaSans-Bold.ttf') format('truetype');
+            font-weight: 600 700 800;
+            font-style: normal;
         }
+        @font-face {
+            font-family: 'Plus Jakarta Sans';
+            src: url('../PlusJakartaSans-Regular.ttf') format('truetype');
+            font-weight: 300 400 500;
+            font-style: normal;
+        }
+
+        :root {
+            --navy:        #0C1526;
+            --blue:        #2563EB;
+            --vivid:       #3B82F6;
+            --cyan:        #06B6D4;
+            --border:      #E2E8F0;
+            --surface:     #F8FAFC;
+            --text-main:   #0F172A;
+            --text-body:   #334155;
+            --text-muted:  #94A3B8;
+
+            --green-bg:    #DCFCE7; --green-border: #86EFAC; --green-fg: #166534;
+            --amber-bg:    #FEF9C3; --amber-border: #FDE047; --amber-fg: #854D0E;
+            --orange-bg:   #FFEDD5; --orange-border:#FED7AA; --orange-fg: #9A3412;
+            --red-bg:      #FEE2E2; --red-border:   #FECACA; --red-fg:   #991B1B;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
-            padding: 40px;
-            display: flex;
-            justify-content: center;
-            background-color: #CBD5E1;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #FFFFFF;
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
             -webkit-font-smoothing: antialiased;
+            color: var(--text-main);
         }
 
-        .report-wrapper {
-            position: relative;
-            /* Standard A4 aspect ratio approximation */
+        .page {
             width: 850px;
-            min-height: 1100px;
-            background-color: #FFFFFF;
-            box-shadow: 0 25px 50px -12px rgba(10, 25, 47, 0.1);
-            border: 1px solid var(--border-color);
-            padding: 50px 60px;
-            box-sizing: border-box;
-            background-image:
-                radial-gradient(120% 120% at 100% 0%, rgba(2, 132, 199, 0.02) 0%, transparent 40%),
-                radial-gradient(100% 100% at 0% 100%, rgba(2, 132, 199, 0.01) 0%, transparent 40%);
+            background: #FFFFFF;
         }
 
-        /* --- Header --- */
-        .top-header {
+        /* ═══════════════════════════════════════════════
+           HEADER
+        ═══════════════════════════════════════════════ */
+        .header {
+            background: linear-gradient(130deg, #070E1D 0%, #0E1F40 55%, #0B2D5C 100%);
+            padding: 26px 48px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 25px;
-            border-bottom: 2px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -70px; right: -50px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59,130,246,.22) 0%, transparent 70%);
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3B82F6 0%, #06B6D4 50%, #818CF8 100%);
         }
 
-        .report-title-wrapper {
-            display: flex;
-            flex-direction: column;
+        .header-title { position: relative; z-index: 1; }
+        .header-title h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -.5px;
+            margin-bottom: 4px;
         }
-
-        .report-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 32px;
-            font-weight: 600;
-            color: var(--rea-navy-dark);
-            margin: 0 0 5px 0;
-            letter-spacing: -0.5px;
-        }
-
-        .report-subtitle {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--rea-blue-primary);
+        .header-title .sub {
+            font-size: 9px;
+            font-weight: 700;
+            color: #06B6D4;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3.5px;
         }
 
-        .brand-logos {
+        .header-logos {
             display: flex;
             align-items: center;
-            gap: 20px;
-        }
-
-        .brand-logo-rea {
-            height: 35px;
-            object-fit: contain;
-        }
-
-        .brand-logo-sa {
-            height: 22px;
-            object-fit: contain;
-        }
-
-        .brand-logo-separator {
-            width: 1px;
-            height: 25px;
-            background-color: var(--border-color);
-        }
-
-        /* --- Student Identity Section --- */
-        .student-info-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .info-card {
-            background-color: transparent;
-            padding: 8px 10px 16px 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-        }
-
-        .info-card.span-2 {
-            grid-column: span 2;
-        }
-
-        .info-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 6px;
-        }
-
-        .info-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--rea-navy-dark);
-        }
-
-        .info-value.highlight {
-            font-size: 20px;
-            color: var(--rea-blue-primary);
-        }
-
-        /* --- Section Styling --- */
-        .section-wrapper {
-            margin-bottom: 40px;
-        }
-
-        .section-header {
-            font-family: 'Playfair Display', serif;
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--rea-navy-dark);
-            margin-top: 0;
-            margin-bottom: 16px;
-        }
-
-        /* --- Tables --- */
-        .table-container {
-            border-radius: 0;
-            overflow: hidden;
-            background-color: transparent;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            background-color: transparent;
-            padding: 16px 24px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        td {
-            padding: 16px 24px;
-            font-size: 14px;
-            color: var(--text-main);
-            border-bottom: 1px solid var(--border-color);
-            font-weight: 500;
-        }
-
-        tr:last-child td {
-            border-bottom: 1px solid var(--border-color);
-            /* Kept border for consistency on bottom of table */
-        }
-
-        .cell-center {
-            text-align: center;
-        }
-
-        th.cell-center {
-            text-align: center;
-        }
-
-        .cell-dim {
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        /* Compact Table Variant */
-        .table-compact th,
-        .table-compact td {
-            padding: 8px 14px;
-        }
-
-        .table-compact td {
-            font-size: 13px;
-        }
-
-        /* --- Score & Grading Grid --- */
-        .scores-grading-split {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: start;
-            margin-bottom: 40px;
-        }
-
-        /* --- Status Tags --- */
-        .tag {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            white-space: nowrap;
-        }
-
-        .tag-passed {
-            background: var(--success-bg);
-            color: var(--success-text);
-        }
-
-        .tag-improve {
-            background: var(--warning-bg);
-            color: var(--warning-text);
-        }
-
-        .tag-failed {
-            background: var(--danger-bg);
-            color: var(--danger-text);
-        }
-
-        .tag-grade {
-            display: inline-block;
-            background: var(--rea-navy-dark);
-            color: #FFFFFF;
-            width: 24px;
-            height: 24px;
-            line-height: 24px;
-            text-align: center;
-            border-radius: 4px;
-        }
-
-        /* --- Overall Review --- */
-        .review-box {
-            background-color: #FFFFFF;
-            border-left: 4px solid var(--rea-blue-primary);
-            padding: 24px 30px;
-            font-size: 14px;
-            line-height: 1.8;
-            color: var(--text-body);
-            font-style: italic;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border-radius: 0 12px 12px 0;
-            position: relative;
-        }
-
-        .review-box::before {
-            content: '"';
-            font-family: 'Playfair Display', serif;
-            font-size: 80px;
-            color: var(--rea-blue-soft);
-            position: absolute;
-            top: -10px;
-            left: 15px;
-            opacity: 0.5;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .review-content {
+            gap: 14px;
             position: relative;
             z-index: 1;
         }
+        .logo { height: 28px; object-fit: contain; filter: brightness(0) invert(1); }
+        .logo-sep { width: 1px; height: 22px; background: rgba(255,255,255,.2); }
 
-        /* --- Print Optimizations --- */
-        @media print {
-            body {
-                background-color: white;
-                padding: 0;
-            }
+        /* ═══════════════════════════════════════════════
+           CONTENT AREA
+        ═══════════════════════════════════════════════ */
+        .content { padding: 26px 48px 40px; }
 
-            .report-wrapper {
-                box-shadow: none;
-                border: none;
-                width: 100%;
-                padding: 20px;
-            }
+        /* ═══════════════════════════════════════════════
+           STUDENT INFO — 5 columns, 1 row
+        ═══════════════════════════════════════════════ */
+        .info-row {
+            display: grid;
+            grid-template-columns: 2.6fr 1.7fr 1.1fr 0.85fr 1.45fr;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 26px;
+            box-shadow: 0 2px 12px rgba(15,23,42,.07),
+                        0 0 0 1px rgba(59,130,246,.06);
+        }
 
-            .info-card {
-                break-inside: avoid;
-            }
+        .info-cell {
+            padding: 15px 18px;
+            border-right: 1.5px solid var(--border);
+            background: linear-gradient(180deg, #FFFFFF 0%, #FAFCFF 100%);
+            position: relative;
+        }
+        .info-cell::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--vivid), var(--cyan));
+        }
+        .info-cell:last-child { border-right: none; }
 
-            .table-container {
-                break-inside: avoid;
-            }
+        .cell-label {
+            font-size: 8px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            margin-bottom: 6px;
+        }
+        .cell-value {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.25;
+        }
+        .cell-sub {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        /* Big score — gradient text */
+        .score-big {
+            font-size: 34px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        /* Grade letter */
+        .grade-big {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--navy);
+            line-height: 1;
+        }
+
+        /* ═══════════════════════════════════════════════
+           STATUS BADGES
+        ═══════════════════════════════════════════════ */
+        .badge {
+            display: inline-block;
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-size: 9.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            border: 1.5px solid;
+            margin-top: 4px;
+        }
+        .badge-passed  { background:var(--green-bg);  color:var(--green-fg);  border-color:var(--green-border); }
+        .badge-improve { background:var(--amber-bg);  color:var(--amber-fg);  border-color:var(--amber-border); }
+        .badge-assist  { background:var(--orange-bg); color:var(--orange-fg); border-color:var(--orange-border); }
+        .badge-failed  { background:var(--red-bg);    color:var(--red-fg);    border-color:var(--red-border); }
+
+        /* ═══════════════════════════════════════════════
+           SECTION HEADERS
+        ═══════════════════════════════════════════════ */
+        .section { margin-bottom: 22px; }
+
+        .section-title {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 0 8px 12px;
+            margin-bottom: 10px;
+            border-bottom: 1.5px solid var(--border);
+            border-left: 4px solid var(--vivid);
+        }
+
+        /* ═══════════════════════════════════════════════
+           TABLES
+        ═══════════════════════════════════════════════ */
+        .tbl-wrap {
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        thead th {
+            padding: 9px 16px;
+            font-size: 8px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: linear-gradient(90deg, #EFF3FB, #F7FAFF);
+            border-bottom: 1.5px solid var(--border);
+            text-align: left;
+        }
+        thead th.c { text-align: center; }
+
+        tbody td {
+            padding: 9px 16px;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--text-body);
+            border-bottom: 1px solid var(--border);
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:nth-child(even) td { background-color: #FAFBFE; }
+
+        td.c   { text-align: center; }
+        td.dim { color: var(--text-muted); font-weight: 400; }
+
+        /* ═══════════════════════════════════════════════
+           TWO-COLUMN LAYOUT
+        ═══════════════════════════════════════════════ */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        /* Grade tags in grading scale */
+        .grade-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px; height: 26px;
+            border-radius: 7px;
+            background: var(--navy);
+            color: #FFF;
+            font-size: 13px;
+            font-weight: 800;
         }
     </style>
 </head>
 
 <body>
-    <div class="report-wrapper">
+<div class="page">
 
-        <!-- Header -->
-        <div class="top-header">
-            <div class="report-title-wrapper">
-                <h1 class="report-title">Academic Record</h1>
-                <div class="report-subtitle">Official Student Report</div>
-            </div>
-            <div class="brand-logos">
-                <!-- Using relative paths so it loads correctly like the certificates -->
-                <img src="../assets/Logo REA (black).png" alt="REA" class="brand-logo-rea">
-                <div class="brand-logo-separator"></div>
-                <img src="../assets/Logo SA Pro (black).png" alt="SA Pro" class="brand-logo-sa">
-            </div>
+    <!-- ── Header ──────────────────────────────────────────────────── -->
+    <div class="header">
+        <div class="header-title">
+            <h1>Student Report</h1>
+            <div class="sub">Official Academic Record</div>
         </div>
+        <div class="header-logos">
+            <img class="logo" src="../assets/Logo REA (black).png" alt="REA">
+            <div class="logo-sep"></div>
+            <img class="logo" src="../assets/Logo SA Pro (black).png" alt="SA Pro">
+        </div>
+    </div>
 
-        <!-- Student Information Grid -->
-        <div class="student-info-grid">
-            <div class="info-card span-2">
-                <div class="info-label">Student Name</div>
-                <div class="info-value">Mareta Ayu Handanari</div>
+    <!-- ── Content ─────────────────────────────────────────────────── -->
+    <div class="content">
+
+        <!-- Student Info: 5 col single row -->
+        <div class="info-row">
+            <div class="info-cell">
+                <div class="cell-label">Student Name</div>
+                <div class="cell-value">{{NAME}}</div>
+                <div class="cell-sub">AI Engineering Bootcamp &middot; Batch {{BATCH}}</div>
             </div>
-            <div class="info-card">
-                <div class="info-label">Student ID</div>
-                <div class="info-value">REA/28022026/S1/001</div>
+            <div class="info-cell">
+                <div class="cell-label">Student ID</div>
+                <div class="cell-value" style="font-size:12.5px; word-break:break-all;">{{STUDENT_ID}}</div>
             </div>
-            <div class="info-card span-2">
-                <div class="info-label">Program</div>
-                <div class="info-value">AI Engineering Bootcamp Batch 9</div>
+            <div class="info-cell">
+                <div class="cell-label">Score</div>
+                <div class="score-big">{{CURRENT_SCORE}}</div>
             </div>
-            <div class="info-card">
-                <div class="info-label">Current Score</div>
-                <div class="info-value highlight">95</div>
+            <div class="info-cell">
+                <div class="cell-label">Grade</div>
+                <div class="grade-big">{{GRADE}}</div>
             </div>
-            <div class="info-card">
-                <div class="info-label">CGPA</div>
-                <div class="info-value">A</div>
-            </div>
-            <div class="info-card span-2">
-                <div class="info-label">Status</div>
-                <div class="info-value">
-                    <span class="tag tag-passed">Passed</span>
-                </div>
+            <div class="info-cell">
+                <div class="cell-label">Status</div>
+                <span class="badge {{STATUS_TAG_CLASS}}">{{STATUS}}</span>
             </div>
         </div>
 
         <!-- Attendance & Project Recap -->
-        <div class="section-wrapper">
-            <h2 class="section-header">Attendance & Project Recap</h2>
-            <div class="table-container">
+        <div class="section">
+            <div class="section-title">Attendance &amp; Project Recap</div>
+            <div class="tbl-wrap">
                 <table>
                     <thead>
                         <tr>
                             <th>Course Module</th>
-                            <th class="cell-center">Attendance</th>
-                            <th class="cell-center">Project Task</th>
-                            <th class="cell-center">Final Project</th>
+                            <th class="c">Attendance</th>
+                            <th class="c">Project Score</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Phase 1 - Python Foundations</td>
-                            <td class="cell-center">100%</td>
-                            <td class="cell-center">95</td>
-                            <td class="cell-center">92</td>
+                            <td>Course 1 &middot; Python</td>
+                            <td class="c">{{ATR1}}</td>
+                            <td class="c {{PRJ1_DIM}}">{{PRJ1}}</td>
                         </tr>
                         <tr>
-                            <td>Phase 2 - Machine Learning Intro</td>
-                            <td class="cell-center">100%</td>
-                            <td class="cell-center">88</td>
-                            <td class="cell-center cell-dim">N/A</td>
+                            <td>Course 2 &middot; Vibe Coding &amp; n8n</td>
+                            <td class="c">{{ATR2}}</td>
+                            <td class="c {{PRJ2_DIM}}">{{PRJ2}}</td>
                         </tr>
                         <tr>
-                            <td>Phase 3 - Deep Learning & LLMs</td>
-                            <td class="cell-center">100%</td>
-                            <td class="cell-center cell-dim">N/A</td>
-                            <td class="cell-center cell-dim">N/A</td>
+                            <td>Course 3 &middot; Machine Learning</td>
+                            <td class="c">{{ATR3}}</td>
+                            <td class="c {{PRJ3_DIM}}">{{PRJ3}}</td>
+                        </tr>
+                        <tr>
+                            <td>Course 4 &middot; Deep Learning</td>
+                            <td class="c">{{ATR4}}</td>
+                            <td class="c {{PRJ4_DIM}}">{{PRJ4}}</td>
+                        </tr>
+                        <tr>
+                            <td>Course 5 &middot; Visual Model &amp; RAG</td>
+                            <td class="c">{{ATR5}}</td>
+                            <td class="c dim">&mdash;</td>
+                        </tr>
+                        <tr>
+                            <td>Course 6 &middot; Large Language Model</td>
+                            <td class="c">{{ATR6}}</td>
+                            <td class="c dim">&mdash;</td>
+                        </tr>
+                        <tr>
+                            <td>Course 7 &middot; Speech Model &amp; Agentic AI</td>
+                            <td class="c">{{ATR7}}</td>
+                            <td class="c dim">&mdash;</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div class="scores-grading-split">
-            <!-- Score Recap -->
-            <div class="section-wrapper" style="margin-bottom: 0;">
-                <h2 class="section-header">Score Recap</h2>
-                <div class="table-container">
-                    <table class="table-compact">
+        <!-- Score Recap + Grading Scale -->
+        <div class="two-col">
+            <div class="section" style="margin-bottom:0;">
+                <div class="section-title">Score Recap</div>
+                <div class="tbl-wrap">
+                    <table>
                         <thead>
                             <tr>
-                                <th>Assessment Phase</th>
-                                <th class="cell-center">Score</th>
+                                <th>Assessment</th>
+                                <th class="c">Score</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Pre Test Score Phase 1</td>
-                                <td class="cell-center">84</td>
+                                <td>Pre Test Score</td>
+                                <td class="c">{{PRE_TEST}}</td>
                             </tr>
                             <tr>
                                 <td>Post Test Score</td>
-                                <td class="cell-center cell-dim">N/A</td>
+                                <td class="c {{POST_DIM}}">{{POST_TEST}}</td>
                             </tr>
                             <tr>
-                                <td>Final Project Score</td>
-                                <td class="cell-center cell-dim">N/A</td>
+                                <td>Cumulative Attendance Rate</td>
+                                <td class="c">{{ATC_ACCUM}}</td>
+                            </tr>
+                            <tr>
+                                <td>Capstone Project</td>
+                                <td class="c {{FP_DIM}}">{{FP}}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Grading Scale -->
-            <div class="section-wrapper" style="margin-bottom: 0;">
-                <h2 class="section-header">Grading Scale</h2>
-                <div class="table-container">
-                    <table class="table-compact">
+            <div class="section" style="margin-bottom:0;">
+                <div class="section-title">Grading Scale</div>
+                <div class="tbl-wrap">
+                    <table>
                         <thead>
                             <tr>
-                                <th class="cell-center" style="width: 15%;">Grade</th>
+                                <th class="c" style="width:16%;">Grade</th>
                                 <th>Range</th>
-                                <th class="cell-center" style="width: 50%;">Status</th>
+                                <th class="c" style="width:48%;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="cell-center"><span class="tag-grade">A</span></td>
-                                <td class="cell-dim">85 - 100</td>
-                                <td class="cell-center"><span class="tag tag-passed">Passed</span></td>
+                                <td class="c"><span class="grade-tag">A</span></td>
+                                <td class="dim">85 – 100</td>
+                                <td class="c"><span class="badge badge-passed">Passed</span></td>
                             </tr>
                             <tr>
-                                <td class="cell-center"><span class="tag-grade">B</span></td>
-                                <td class="cell-dim">70 - 84.99</td>
-                                <td class="cell-center"><span class="tag tag-improve">Need Improvement</span></td>
+                                <td class="c"><span class="grade-tag">B</span></td>
+                                <td class="dim">70 – 84.99</td>
+                                <td class="c"><span class="badge badge-passed">Passed</span></td>
                             </tr>
                             <tr>
-                                <td class="cell-center"><span class="tag-grade">C</span></td>
-                                <td class="cell-dim">60 - 69.99</td>
-                                <td class="cell-center"><span class="tag tag-improve">Need Improvement</span></td>
+                                <td class="c"><span class="grade-tag">C</span></td>
+                                <td class="dim">60 – 69.99</td>
+                                <td class="c"><span class="badge badge-improve">Need Improvement</span></td>
                             </tr>
                             <tr>
-                                <td class="cell-center"><span class="tag-grade">D</span></td>
-                                <td class="cell-dim">45 - 59.99</td>
-                                <td class="cell-center"><span class="tag tag-improve"
-                                        style="background:#FFEDD5; color:#C2410C;">Need Assistance</span></td>
+                                <td class="c"><span class="grade-tag">D</span></td>
+                                <td class="dim">45 – 59.99</td>
+                                <td class="c"><span class="badge badge-assist">Need Assistance</span></td>
                             </tr>
                             <tr>
-                                <td class="cell-center"><span class="tag-grade">E</span></td>
-                                <td class="cell-dim">
-                                    < 45</td>
-                                <td class="cell-center"><span class="tag tag-failed">Failed</span></td>
+                                <td class="c"><span class="grade-tag">E</span></td>
+                                <td class="dim">&lt; 45</td>
+                                <td class="c"><span class="badge badge-failed">Failed</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -488,21 +449,7 @@
             </div>
         </div>
 
-        <!-- Overall Review -->
-        <div class="section-wrapper">
-            <h2 class="section-header">Overall Review</h2>
-            <div class="review-box">
-                <div class="review-content">
-                    Mareta has demonstrated outstanding problem-solving skills throughout the Bootcamp. Her final
-                    project
-                    implementation showcases a very strong grasp of both algorithmic logic and integration pipelines.
-                    She is
-                    highly recommended to advance to higher-level engineering tasks.
-                </div>
-            </div>
-        </div>
-
-    </div>
+    </div><!-- /content -->
+</div><!-- /page -->
 </body>
-
 </html>
