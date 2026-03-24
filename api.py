@@ -141,13 +141,13 @@ def draw_cert_image(
     color_desc = "#334155" # Slate-700
     color_cert = "#0284c7" # Light Blue
     
-    # 1. Gambar Nama (Mathematical Center Y ~ 770)
-    name_pos = (260, 770)
+    # 1. Gambar Nama - Berada di bawah "IS PROUDLY AWARDED TO" (Y=560)
+    name_pos = (260, 560)
     draw.text(name_pos, name, font=font_name, fill=color_name)
 
-    # 2. Gambar Deskripsi (Mathematical Y ~ 920, sitting exactly above Program Block Y ~ 1000)
+    # 2. Gambar Deskripsi - Tepat berada di bawah Nama, dan berada DI ATAS "Batch 10" (Y=720)
     desc_wrapped = textwrap.fill(desc, width=90)
-    desc_pos = (265, 920)
+    desc_pos = (265, 720)
     draw.multiline_text(desc_pos, desc_wrapped, font=font_desc, fill=color_desc, spacing=15)
 
     # 3. Gambar Credential ID (Pill inside HTML is drawn around Y=220-260).
