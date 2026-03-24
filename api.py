@@ -43,7 +43,7 @@ FONT_PATH_BOLD = str(BASE_DIR / "PlusJakartaSans-Bold.ttf")
 FONT_PATH_REG  = str(BASE_DIR / "PlusJakartaSans-Regular.ttf")
 
 try:
-    font_name    = ImageFont.truetype(FONT_PATH_BOLD, 110)
+    font_name    = ImageFont.truetype(FONT_PATH_BOLD, 80)
     font_desc_reg= ImageFont.truetype(FONT_PATH_REG, 38)
     font_desc_bld= ImageFont.truetype(FONT_PATH_BOLD, 38)
     font_cert_id = ImageFont.truetype(FONT_PATH_BOLD, 32)
@@ -178,15 +178,9 @@ def draw_cert_image(
     color_desc = "#334155" # Slate-700
     color_cert = "#0284c7" # Light Blue
     
-    # 1. Gambar Nama - auto-scale agar tidak melebihi lebar canvas
-    MAX_NAME_WIDTH = 1800  # px, batas lebar nama di canvas 2480px
-    name_font_size = 110
-    dynamic_font = ImageFont.truetype(FONT_PATH_BOLD, name_font_size)
-    while draw.textlength(name, font=dynamic_font) > MAX_NAME_WIDTH and name_font_size > 60:
-        name_font_size -= 4
-        dynamic_font = ImageFont.truetype(FONT_PATH_BOLD, name_font_size)
+    # 1. Gambar Nama - ukuran fixed 80px untuk semua nama
     name_pos = (260, 600)
-    draw.text(name_pos, name, font=dynamic_font, fill=color_name)
+    draw.text(name_pos, name, font=font_name, fill=color_name)
 
     # 2. Gambar Deskripsi - (Rich Text dg Bold)
     desc_pos = (265, 780)
