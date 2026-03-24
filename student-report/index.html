@@ -74,22 +74,22 @@
             content: '';
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #3B82F6 0%, #06B6D4 50%, #818CF8 100%);
+            height: 1.5px;
+            background: rgba(255,255,255,.1);
         }
 
         .header-title { position: relative; z-index: 1; }
         .header-title h1 {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 800;
             color: #FFFFFF;
             letter-spacing: -.5px;
             margin-bottom: 4px;
         }
         .header-title .sub {
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 700;
-            color: #06B6D4;
+            color: #B4C6E7;
             text-transform: uppercase;
             letter-spacing: 3.5px;
         }
@@ -101,78 +101,62 @@
             position: relative;
             z-index: 1;
         }
-        .logo { height: 28px; object-fit: contain; filter: brightness(0) invert(1); }
-        .logo-sep { width: 1px; height: 22px; background: rgba(255,255,255,.2); }
+        .logo { height: 32px; object-fit: contain; filter: brightness(0) invert(1); }
+        .logo-sep { width: 1px; height: 26px; background: rgba(255,255,255,.2); }
 
         /* ═══════════════════════════════════════════════
            CONTENT AREA
         ═══════════════════════════════════════════════ */
-        .content { padding: 26px 48px 40px; }
+        .content { padding: 32px 48px 40px; }
 
         /* ═══════════════════════════════════════════════
-           STUDENT INFO — 5 columns, 1 row
+           STUDENT INFO — 4 columns, 1 row
         ═══════════════════════════════════════════════ */
         .info-row {
             display: grid;
-            grid-template-columns: 2.6fr 1.7fr 1.1fr 0.85fr 1.45fr;
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
+            grid-template-columns: 2fr 1.2fr 1fr 1.2fr;
+            border: 1px solid var(--border);
+            border-radius: 10px;
             overflow: hidden;
-            margin-bottom: 26px;
-            box-shadow: 0 2px 12px rgba(15,23,42,.07),
-                        0 0 0 1px rgba(59,130,246,.06);
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .info-cell {
-            padding: 15px 18px;
-            border-right: 1.5px solid var(--border);
-            background: linear-gradient(180deg, #FFFFFF 0%, #FAFCFF 100%);
+            padding: 16px 20px;
+            border-right: 1px solid var(--border);
+            background: #FFFFFF;
             position: relative;
         }
-        .info-cell::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--vivid), var(--cyan));
-        }
+        /* Removed blue bar from info cell */
         .info-cell:last-child { border-right: none; }
 
         .cell-label {
-            font-size: 8px;
+            font-size: 9px;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1.8px;
-            margin-bottom: 6px;
+            letter-spacing: 1.2px;
+            margin-bottom: 8px;
         }
         .cell-value {
-            font-size: 13.5px;
+            font-size: 15px;
             font-weight: 700;
             color: var(--text-main);
-            line-height: 1.25;
-        }
-        .cell-sub {
-            font-size: 10px;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-top: 3px;
+            line-height: 1.2;
         }
 
-        /* Big score — gradient text */
+        /* Big score — clean navy text */
         .score-big {
-            font-size: 34px;
+            font-size: 38px;
             font-weight: 800;
-            background: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--blue);
             line-height: 1;
         }
 
         /* Grade letter */
         .grade-big {
-            font-size: 30px;
+            font-size: 34px;
             font-weight: 800;
             color: var(--navy);
             line-height: 1;
@@ -183,35 +167,44 @@
         ═══════════════════════════════════════════════ */
         .badge {
             display: inline-block;
-            padding: 5px 11px;
-            border-radius: 20px;
-            font-size: 9.5px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: .8px;
-            border: 1.5px solid;
-            margin-top: 4px;
+            letter-spacing: .5px;
+            margin-top: 5px;
         }
-        .badge-passed  { background:var(--green-bg);  color:var(--green-fg);  border-color:var(--green-border); }
-        .badge-improve { background:var(--amber-bg);  color:var(--amber-fg);  border-color:var(--amber-border); }
-        .badge-assist  { background:var(--orange-bg); color:var(--orange-fg); border-color:var(--orange-border); }
-        .badge-failed  { background:var(--red-bg);    color:var(--red-fg);    border-color:var(--red-border); }
+        .badge-passed  { background:var(--green-bg);  color:var(--green-fg); }
+        .badge-improve { background:var(--amber-bg);  color:var(--amber-fg); }
+        .badge-assist  { background:var(--orange-bg); color:var(--orange-fg); }
+        .badge-failed  { background:var(--red-bg);    color:var(--red-fg); }
 
         /* ═══════════════════════════════════════════════
            SECTION HEADERS
         ═══════════════════════════════════════════════ */
-        .section { margin-bottom: 22px; }
+        .section { margin-bottom: 28px; }
 
         .section-title {
-            font-size: 10.5px;
+            font-size: 12px;
             font-weight: 800;
-            color: var(--text-main);
+            color: var(--navy);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 0 0 8px 12px;
-            margin-bottom: 10px;
-            border-bottom: 1.5px solid var(--border);
-            border-left: 4px solid var(--vivid);
+            letter-spacing: 1.2px;
+            padding: 0 0 10px 0;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--navy);
+            display: flex;
+            align-items: center;
+        }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--blue);
+            margin-right: 10px;
+            border-radius: 2px;
         }
 
         /* ═══════════════════════════════════════════════
