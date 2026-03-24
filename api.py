@@ -210,14 +210,16 @@ def generate_cert(req: CertRequest, filename: Optional[str] = None, format: Opti
     score_val = safe_float(req.current_score)
     cert_type = (req.cert_type or "").upper()
 
+    # Auto-detect cert type if not explicitly provided
     if cert_type not in ("COC", "COE", "BEST"):
         if score_val >= 70:
-            cert_type = "COE"
+            cert_type = "COE"   # Dapet COE (juga berhak COC, tapi perlu hit API terpisah)
         elif atc_val >= 70:
-            cert_type = "COC"
+            cert_type = "COC"   # Hanya COC (attendance only)
         else:
-            raise HTTPException(status_code=400, detail="Student tidak memenuhi syarat")
+            raise HTTPException(status_code=400, detail="Student tidak memenuhi syarat: score < 70 dan atc < 70%")
 
+    # Validasi eksplisit per cert type
     if cert_type == "COE" and score_val < 70:
         raise HTTPException(status_code=400, detail="COE requires Current Score >= 70")
     if cert_type == "COC" and atc_val < 70:
