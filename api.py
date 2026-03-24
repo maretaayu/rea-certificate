@@ -30,7 +30,7 @@ from PIL import Image, ImageDraw, ImageFont
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Union
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 BASE_DIR       = Path(os.path.dirname(os.path.abspath(__file__)))
@@ -102,12 +102,12 @@ app.add_middleware(
 # ─── MODELS ───────────────────────────────────────────────────────────────────
 class CertRequest(BaseModel):
     name          : str
-    student_id    : str
-    atc_accum     : str             = "0%"
-    current_score : str             = "0"
-    current_grade : str             = ""
-    cert_type     : Optional[str]   = None
-    batch         : str             = BATCH
+    student_id    : Union[str, int]
+    atc_accum     : Union[str, int, float] = "0%"
+    current_score : Union[str, int, float] = "0"
+    current_grade : Union[str, int, float] = ""
+    cert_type     : Optional[str]          = None
+    batch         : Union[str, int]        = BATCH
 
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
 def pct_to_float(val: str) -> float:
