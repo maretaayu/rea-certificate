@@ -116,20 +116,20 @@ def draw_cert_image(
         desc = (
             f"For demonstrating exceptional dedication, fulfilling all comprehensive curriculum requirements, "
             f"and successfully delivering an outstanding final project, thereby earning the status of "
-            f"BEST STUDENT."
+            f"BEST STUDENT in the following program:"
         )
     elif cert_type_label == "COE":
         img_path = TEMPLATE_COE
         desc = (
             f"For demonstrating exceptional dedication and successfully fulfilling all curriculum requirements "
-            f"with a score of {int(score)}, thereby earning the grade of {grade}."
+            f"with a score of {int(score)}, thereby earning the grade of {grade} in the following program:"
         )
     else:  # COC
         img_path = TEMPLATE_COC
         desc = (
             f"For demonstrating strong commitment and successfully fulfilling the attendance requirements "
             f"with an accumulation score of {atc_str} throughout the sessions, thereby earning the status "
-            f"of PASSED."
+            f"of PASSED in the following program:"
         )
 
     # Buka gambar template
@@ -141,17 +141,17 @@ def draw_cert_image(
     color_desc = "#334155" # Slate-700
     color_cert = "#0284c7" # Light Blue untuk Cert ID (karena background putih)
     
-    # 1. Gambar Nama - Diangkat sedikit agar tidak menabrak Batch 10
-    name_pos = (260, 680)
+    # 1. Gambar Nama - Koordinat dikembalikan ke aslinya (berada di atas Deskripsi)
+    name_pos = (260, 480)
     draw.text(name_pos, name, font=font_name, fill=color_name)
 
     # 2. Gambar Deskripsi yang dibungkus otomatis
     desc_wrapped = textwrap.fill(desc, width=90)
-    desc_pos = (265, 960)
+    desc_pos = (265, 620)
     draw.multiline_text(desc_pos, desc_wrapped, font=font_desc, fill=color_desc, spacing=15)
 
     # 3. Gambar Credential ID - Diangkat sejajar ke atas, diratakan kanan
-    cert_id_pos = (2150, 350)
+    cert_id_pos = (2120, 275)
     draw.text(cert_id_pos, cert_id, font=font_cert_id, fill=color_cert, anchor="ra")
 
     # Export ke Bytes
