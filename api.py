@@ -139,19 +139,19 @@ def draw_cert_image(
     # Warna
     color_name = "#1e293b" # Slate-800
     color_desc = "#334155" # Slate-700
-    color_cert = "#0284c7" # Light Blue untuk Cert ID (karena background putih)
+    color_cert = "#0284c7" # Light Blue
     
-    # 1. Gambar Nama - Koordinat dikembalikan ke aslinya (berada di atas Deskripsi)
-    name_pos = (260, 480)
+    # 1. Gambar Nama (Mathematical Center Y ~ 770)
+    name_pos = (260, 770)
     draw.text(name_pos, name, font=font_name, fill=color_name)
 
-    # 2. Gambar Deskripsi yang dibungkus otomatis
+    # 2. Gambar Deskripsi (Mathematical Y ~ 920, sitting exactly above Program Block Y ~ 1000)
     desc_wrapped = textwrap.fill(desc, width=90)
-    desc_pos = (265, 620)
+    desc_pos = (265, 920)
     draw.multiline_text(desc_pos, desc_wrapped, font=font_desc, fill=color_desc, spacing=15)
 
-    # 3. Gambar Credential ID - Diangkat sejajar ke atas, diratakan kanan
-    cert_id_pos = (2120, 275)
+    # 3. Gambar Credential ID (Pill inside HTML is drawn around Y=220-260).
+    cert_id_pos = (2120, 245)
     draw.text(cert_id_pos, cert_id, font=font_cert_id, fill=color_cert, anchor="ra")
 
     # Export ke Bytes
