@@ -156,7 +156,7 @@ def draw_cert_image(
         img_path = TEMPLATE_COE
         desc = (
             f"For demonstrating exceptional dedication and successfully fulfilling all curriculum requirements "
-            f"with a score of <b>{int(score)}</b>, thereby earning the grade of <b>{grade_str}</b> in the following program:"
+            f"with a score of <b>{int(score)}</b>, thereby earning the status of <b>PASSED</b> with the grade of <b>{grade_str}</b> in the following program:"
         )
     else:  # COC
         img_path = TEMPLATE_COC
