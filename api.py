@@ -186,13 +186,6 @@ def draw_cert_image(
     cert_id_pos = (2170, 245)
     draw.text(cert_id_pos, cert_id, font=font_cert_id, fill=color_cert, anchor="ra")
 
-    # 4. Patch "Verify Authenticity" URL (Since it's in the template)
-    # Drawing a white box over the old URL and writing the new one.
-    # Estimated position for the small footer area (X=260, Y=2330-2450)
-    # 1835 was too high, footer is near the bottom.
-    draw.rectangle([250, 2320, 1000, 2430], fill="#FFFFFF")
-    draw.text((260, 2335), "Verify authenticity at ruangguru.com/rea/verify", font=get_font_report(FONT_PATH_REG, 22), fill="#64748b")
-
     # Export ke Bytes
     buf = io.BytesIO()
     img.save(buf, format="PNG", quality=95)
