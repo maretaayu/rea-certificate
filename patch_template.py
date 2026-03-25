@@ -2,41 +2,56 @@
 One-time script to patch the 'skillacademy.com/verify' URL in the
 certificate template PNG files.
 
+Strategy:
+  - Sample background pixels row-by-row to get natural gradient fill
+  - Overlay a subtle dot grid that matches the certificate's existing pattern
+  - Write the new URL text at a comfortable 20px font size
+
 Run once:  python patch_template.py
 """
 from PIL import Image, ImageDraw, ImageFont
 import os
 
-FONT_PATH_REG  = "PlusJakartaSans-Regular.ttf"
+FONT_PATH_REG = "PlusJakartaSans-Regular.ttf"
 
-# From pixel analysis:
-# Line 1 (gray):  "This credential verifies..."       y=1382-1394, font ~16px
-# Line 2 (gray):  "completion of the boot camp."      y=1413-1430
-# Line 3 (blue):  "Verify authenticity at ..."        y=1447-1475, rightmost x=1130
-#
-# We need to erase EVERYTHING in line 3's band (including any previous patches)
-# and rewrite it at the matching font size.
+GRAY_COLOR = "#94a3b8"
+BLUE_COLOR = "#0284c7"
 
-BG_COLOR   = "#e0f4fe"   # Background gradient colour at footer area
-GRAY_COLOR = "#94a3b8"   # Same muted grey as "Verify authenticity at"
-BLUE_COLOR = "#0284c7"   # Same blue as original link
+# From pixel analysis: line 3 is at y=1447-1475, rightmost text at x=1130
+ERASE_X0, ERASE_X1 = 260, 1160
+ERASE_Y0, ERASE_Y1 = 1435, 1490
 
-# Erase rect — wider than rightmost detected pixel to be safe
-ERASE_RECT = (260, 1435, 1160, 1490)
-
-TEXT_Y     = 1447    # Top of glyph for new text
-TEXT_X     = 273     # Left margin
-FONT_SIZE  = 16      # Matches gray text height from pixel analysis
+TEXT_Y    = 1449
+TEXT_X    = 273
+FONT_SIZE = 20   # slightly bigger than the 16px gray text above, but still small
 
 
 def patch(img_path: str) -> None:
     img  = Image.open(img_path).convert("RGB")
     draw = ImageDraw.Draw(img)
 
-    # ── 1. Erase old URL (and any previous patch attempt) ──────────────
-    draw.rectangle(list(ERASE_RECT), fill=BG_COLOR)
+    # ── 1. Sample background gradient from undisturbed columns ──────────
+    # Use x=1180 (just outside erase zone but same y rows) to sample the
+    # natural gradient colour at each row, then fill the erase zone per-row.
+    for y in range(ERASE_Y0, ERASE_Y1 + 1):
+        # Sample a clean background column far to the right (past any text)
+        r, g, b = img.getpixel((min(1200, img.width - 1), y))
+        draw.line([(ERASE_X0, y), (ERASE_X1, y)], fill=(r, g, b))
 
-    # ── 2. Write replacement text ──────────────────────────────────────
+    # ── 2. Overlay a subtle translucent dot grid (like template pattern) ─
+    # Spacing: 26x26 px to echo the certificate's existing 28px diagonal grid
+    dot_color_base = img.getpixel((700, 1460))          # background at midpoint
+    dot_r = max(0, dot_color_base[0] - 12)              # slightly darker than bg
+    dot_g = max(0, dot_color_base[1] - 8)
+    dot_b = max(0, dot_color_base[2] - 4)
+    dot_color = (dot_r, dot_g, dot_b)
+
+    step = 26
+    for y in range(ERASE_Y0 + 4, ERASE_Y1, step):
+        for x in range(ERASE_X0 + 4, ERASE_X1, step):
+            draw.ellipse([x, y, x + 2, y + 2], fill=dot_color)
+
+    # ── 3. Write new URL ─────────────────────────────────────────────────
     try:
         font = ImageFont.truetype(FONT_PATH_REG, FONT_SIZE)
     except Exception:
