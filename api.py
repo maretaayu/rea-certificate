@@ -209,8 +209,8 @@ def draw_report_v4(req: ReportRequest):
         try: return ImageFont.truetype(path, size)
         except: return ImageFont.load_default()
 
-    # Create Canvas (Increased height to prevent cutting)
-    W, H = 850, 1350
+    # Create Canvas (Balanced height)
+    W, H = 850, 1250
     img = Image.new('RGB', (W, H), '#FFFFFF')
     draw = ImageDraw.Draw(img)
 
@@ -267,12 +267,16 @@ def draw_report_v4(req: ReportRequest):
     margin_x = 60
     w_main = W - 2 * margin_x
 
-    # --- 2. TOP GRID (Row-based Bio & Academic) ---
+    # --- 2. TOP GRID (Dynamic Widths: 60/40) ---
     y_grid = header_h + 40
     r_h = 52
-    col_w = w_main // 2
-    lbl_w = int(col_w * 0.38)
-    val_w = col_w - lbl_w
+    w_left = int(w_main * 0.6)
+    w_right = w_main - w_left
+    
+    l_lbl_w = int(w_left * 0.3)
+    l_val_w = w_left - l_lbl_w
+    r_lbl_w = int(w_right * 0.5)
+    r_val_w = w_right - r_lbl_w
 
     def fv(v): s=str(v).strip(); return "-" if s in ("", "-1", "—", "None") or not s else s
     def fmt_sc(val):
@@ -282,24 +286,24 @@ def draw_report_v4(req: ReportRequest):
         except: return str(val)
 
     # Row 1
-    draw_cell(draw, margin_x, y_grid, lbl_w, r_h, "Student Name", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+lbl_w, y_grid, val_w, r_h, req.name, F_VAL, "#FFFFFF", C_TEXT_BOLD)
-    draw_cell(draw, margin_x+col_w, y_grid, lbl_w, r_h, "Current Score", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+col_w+lbl_w, y_grid, val_w, r_h, fmt_sc(req.current_score), F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x, y_grid, l_lbl_w, r_h, "Student Name", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, req.name, F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x+w_left, y_grid, r_lbl_w, r_h, "Current Score", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+w_left+r_lbl_w, y_grid, r_val_w, r_h, fmt_sc(req.current_score), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
     # Row 2
     y_grid += r_h
-    draw_cell(draw, margin_x, y_grid, lbl_w, r_h, "Student ID", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+lbl_w, y_grid, val_w, r_h, req.student_id, F_VAL, "#FFFFFF", C_TEXT_BOLD)
-    draw_cell(draw, margin_x+col_w, y_grid, lbl_w, r_h, "CCGPA", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+col_w+lbl_w, y_grid, val_w, r_h, fv(req.current_grade), F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x, y_grid, l_lbl_w, r_h, "Student ID", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, req.student_id, F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x+w_left, y_grid, r_lbl_w, r_h, "CCGPA", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+w_left+r_lbl_w, y_grid, r_val_w, r_h, fv(req.current_grade), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
     # Row 3
     y_grid += r_h
-    draw_cell(draw, margin_x, y_grid, lbl_w, r_h, "Program", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+lbl_w, y_grid, val_w, r_h, f"AI Engineering Bootcamp", F_VAL, "#FFFFFF", C_TEXT_BOLD)
-    draw_cell(draw, margin_x+col_w, y_grid, lbl_w, r_h, "Status", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+col_w+lbl_w, y_grid, val_w, r_h, str(req.current_status).title(), F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x, y_grid, l_lbl_w, r_h, "Program", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, f"AI Engineering Bootcamp Batch 11", F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x+w_left, y_grid, r_lbl_w, r_h, "Status", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+w_left+r_lbl_w, y_grid, r_val_w, r_h, str(req.current_status).title(), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
     # --- 3. ATTENDANCE & PROJECT RECAP (Full Width) ---
     y_sec2 = y_grid + r_h + 50 
