@@ -104,39 +104,42 @@ class ReportRequest(BaseModel):
     atr4: str = "—"; prj4: str = "—"; atr5: str = "—"; atr6: str = "—"; atr7: str = "—"
 
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
-def pct_to_float(val: str) -> float:
-    val = str(val).strip()
-    if val.endswith('%'):
-        return float(val[:-1])
+def pct_to_float(val: Union[str, int, float]) -> float:
+    s = str(val).strip()
+    if s.endswith('%'):
+        try: return float(s[:-1])
+        except ValueError: return 0.0
     try:
-        f = float(val)
+        f = float(s)
         if 0 < f <= 1.0:
             return f * 100
         return f
     except ValueError:
         return 0.0
 
-def safe_float(val: str) -> float:
+def safe_float(val: Union[str, int, float]) -> float:
     try:
-        return float(val)
+        return float(str(val))
     except ValueError:
         return 0.0
 
-def make_cert_id(batch: str) -> str:
+def make_cert_id(batch: Union[str, int]) -> str:
     chars = string.ascii_uppercase + string.digits
-    return f"REAENG{batch}" + ''.join(random.choices(chars, k=5))
+    return f"REAENG{str(batch)}" + ''.join(random.choices(chars, k=5))
 
 def draw_cert_image(
     cert_type_label: str,
     name: str,
     cert_id: str,
-    atc_str: str,
+    atc_val_input: Union[str, int, float],
     score: float,
-    grade: str
+    grade: Union[str, int, float]
 ) -> bytes:
     
+    atc_str = str(atc_val_input)
+    grade_str = str(grade)
     try:
-        f_atc = float(atc_str)
+        f_atc = float(atc_str.replace('%', ''))
         if 0 < f_atc <= 1.0:
             atc_str = f"{int(round(f_atc * 100))}%"
     except ValueError:
@@ -153,7 +156,7 @@ def draw_cert_image(
         img_path = TEMPLATE_COE
         desc = (
             f"For demonstrating exceptional dedication and successfully fulfilling all curriculum requirements "
-            f"with a score of <b>{int(score)}</b>, thereby earning the grade of <b>{grade}</b> in the following program:"
+            f"with a score of <b>{int(score)}</b>, thereby earning the grade of <b>{grade_str}</b> in the following program:"
         )
     else:  # COC
         img_path = TEMPLATE_COC
@@ -293,7 +296,7 @@ def generate_cert(req: CertRequest, filename: Optional[str] = None, format: Opti
         cert_type_label = cert_type,
         name            = req.name,
         cert_id         = cert_id,
-        atc_str         = req.atc_accum,
+        atc_val_input   = req.atc_accum,
         score           = score_val,
         grade           = req.current_grade,
     )
