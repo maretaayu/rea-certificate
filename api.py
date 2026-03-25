@@ -4,7 +4,7 @@ REA AI Engineering Certificate & Student Report API
 Native Pillow Implementation for 100% stable layouts on Vercel.
 """
 
-import os, io, random, string
+import os, io, random, string, textwrap
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from fastapi import FastAPI, HTTPException, Response
@@ -34,7 +34,11 @@ F_BIG  = get_font(FONT_BOLD, 54)
 F_BODY = get_font(FONT_REG,  16)
 F_B_B  = get_font(FONT_BOLD, 16)
 
-app = FastAPI(title="REA API")
+app = FastAPI(
+    title="REA API",
+    description="REA AI Engineering Certificate & Student Report API (PIL Native Version)",
+    version="4.0.0"
+)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 class CertRequest(BaseModel):
@@ -57,7 +61,7 @@ def draw_report_v4(req: ReportRequest) -> bytes:
     # Header: Deep Navy
     draw.rectangle([0, 0, W, 180], fill="#0A192F")
     draw.text((50, 60),  "Student Report", font=F_H1, fill="#FFFFFF")
-    draw.text((50, 110), "OFFICIAL ACADEMIC RECORD", font=get_font(FONT_BOLD, 16), fill="#3B82F6")
+    draw.text((50, 110), f"AI ENGINEERING BOOTCAMP • BATCH {req.batch}", font=get_font(FONT_BOLD, 14), fill="#3B82F6")
     
     # Content Section
     y = 220
@@ -67,6 +71,9 @@ def draw_report_v4(req: ReportRequest) -> bytes:
         draw.text((x+15, y+45), str(val), font=F_VAL, fill="#111827")
 
     box(50,  "Student Name", req.name, 350)
+    # Subtitle for name box
+    draw.text((50+15, y+75), f"Batch {req.batch} · AI Engineering Bootcamp", font=get_font(FONT_REG, 11), fill="#6B7280")
+    
     box(410, "Student ID", req.student_id, 150)
     box(570, "Score", str(req.current_score), 100)
     box(680, "Grade", req.current_grade, 100)
@@ -118,9 +125,54 @@ def draw_report_v4(req: ReportRequest) -> bytes:
 
 @app.post("/generate_cert")
 def cert(req: CertRequest):
-    img = Image.open(TEMPLATE_COE if float(str(req.current_score))>=70 else TEMPLATE_COC).convert("RGB")
-    ImageDraw.Draw(img).text((260, 620), req.name, font=get_font(FONT_BOLD, 80), fill="#1e293b")
-    buf = io.BytesIO(); img.save(buf, format="PNG"); buf.seek(0)
+    # Determine certificate type
+    score = float(str(req.current_score))
+    is_coe = score >= 70
+    template = TEMPLATE_COE if is_coe else TEMPLATE_COC
+    
+    img = Image.open(template).convert("RGB")
+    draw = ImageDraw.Draw(img)
+    
+    # Coordinates (Approximate based on known good layout)
+    # Name: (Center horizontally?) In the image it's slightly to the left or centered.
+    # Logic in previous version used (260, 620). Let's stick with that for name.
+    
+    # 1. Name
+    draw.text((260, 620), req.name, font=get_font(FONT_BOLD, 80), fill="#1e293b")
+    
+    # 2. Detailed Description ("Passed" etc)
+    if is_coe:
+        desc = (
+            f"For demonstrating exceptional dedication and successfully fulfilling all curriculum requirements "
+            f"with a score of {score}, thereby earning the grade of {req.current_grade} in the following program:"
+        )
+    else:
+        desc = (
+            f"For demonstrating strong commitment and successfully fulfilling the attendance requirements "
+            f"with an accumulation score of {req.atc_accum} throughout the sessions, thereby earning the status "
+            f"of PASSED in the following program:"
+        )
+    
+    # Wrap text and draw
+    desc_wrapped = textwrap.fill(desc, width=90)
+    draw.multiline_text((260, 750), desc_wrapped, font=get_font(FONT_REG, 24), fill="#334155", spacing=10)
+
+    # 3. Program Name / Batch Info
+    prog_text = f"AI Engineering Bootcamp Batch {req.batch}"
+    draw.text((260, 920), prog_text, font=get_font(FONT_BOLD, 40), fill="#1e293b")
+    
+    # 4. Date
+    date_text = "Jakarta, 23 Maret 2026"
+    draw.text((260, 1680), date_text, font=get_font(FONT_BOLD, 28), fill="#1e293b")
+    
+    # 4. Signature Tag (Alvin Francis Tamie)
+    # In the image it's bottom right.
+    # Not adding signature drawing yet as it requires an asset path in logic,
+    # but the text is usually there in template.
+
+    buf = io.BytesIO()
+    img.save(buf, format="PNG", quality=95)
+    buf.seek(0)
     return Response(content=buf.read(), media_type="image/png")
 
 @app.post("/generate_report")
