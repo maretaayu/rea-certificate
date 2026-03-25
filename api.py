@@ -287,21 +287,21 @@ def draw_report_v4(req: ReportRequest):
 
     # Row 1
     draw_cell(draw, margin_x, y_grid, l_lbl_w, r_h, "Student Name", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, req.name, F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, req.name, F_VAL, "#FFFFFF", C_TEXT_BOLD, align="left")
     draw_cell(draw, margin_x+w_left, y_grid, r_lbl_w, r_h, "Current Score", F_TH, C_LIGHT, C_TEXT)
     draw_cell(draw, margin_x+w_left+r_lbl_w, y_grid, r_val_w, r_h, fmt_sc(req.current_score), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
     # Row 2
     y_grid += r_h
     draw_cell(draw, margin_x, y_grid, l_lbl_w, r_h, "Student ID", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, req.student_id, F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, req.student_id, F_VAL, "#FFFFFF", C_TEXT_BOLD, align="left")
     draw_cell(draw, margin_x+w_left, y_grid, r_lbl_w, r_h, "CCGPA", F_TH, C_LIGHT, C_TEXT)
     draw_cell(draw, margin_x+w_left+r_lbl_w, y_grid, r_val_w, r_h, fv(req.current_grade), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
     # Row 3
     y_grid += r_h
     draw_cell(draw, margin_x, y_grid, l_lbl_w, r_h, "Program", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, f"AI Engineering Bootcamp Batch 11", F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, "AI Engineering Bootcamp Batch 11", F_VAL, "#FFFFFF", C_TEXT_BOLD, align="left")
     draw_cell(draw, margin_x+w_left, y_grid, r_lbl_w, r_h, "Status", F_TH, C_LIGHT, C_TEXT)
     draw_cell(draw, margin_x+w_left+r_lbl_w, y_grid, r_val_w, r_h, str(req.current_status).title(), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
