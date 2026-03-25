@@ -192,72 +192,185 @@ def draw_cert_image(
     buf.seek(0)
     return buf.read()
 
+def truncate_text(draw, text, font, max_w):
+    if draw.textlength(text, font=font) <= max_w:
+        return text
+    # Keep removing characters until it fits with '...'
+    while len(text) > 0 and draw.textlength(text + "...", font=font) > max_w:
+        text = text[:-1]
+    return text + "..."
+
 def draw_report_v4(req: ReportRequest) -> bytes:
-    W, H = 842, 1191 # A4 @ 72 DPI-ish
+    W, H = 850, 1150 # Closest to the HTML container
     img = Image.new('RGB', (W, H), '#FFFFFF')
     draw = ImageDraw.Draw(img)
     
-    # Header: Deep Navy
-    draw.rectangle([0, 0, W, 180], fill="#0A192F")
-    draw.text((50, 60),  "Student Report", font=F_H1, fill="#FFFFFF")
-    draw.text((50, 110), f"AI ENGINEERING BOOTCAMP • BATCH {req.batch}", font=get_font_report(FONT_PATH_BOLD, 14), fill="#3B82F6")
+    # Fonts
+    F_H1 = get_font_report(FONT_PATH_BOLD, 36)
+    F_SUB = get_font_report(FONT_PATH_BOLD, 12)
+    F_LABEL = get_font_report(FONT_PATH_BOLD, 10)
+    F_VAL_NAME = get_font_report(FONT_PATH_BOLD, 20)
+    F_VAL_ID = get_font_report(FONT_PATH_BOLD, 14)
+    F_VAL_BIG = get_font_report(FONT_PATH_BOLD, 36)
+    F_SEC_TITLE = get_font_report(FONT_PATH_BOLD, 15)
+    F_TH = get_font_report(FONT_PATH_BOLD, 10)
+    F_TD = get_font_report(FONT_PATH_REG, 15)
+    F_TD_B = get_font_report(FONT_PATH_BOLD, 15)
     
-    # Content Section
-    y = 220
-    def box(x, label, val, w):
-        draw.rectangle([x, y, x+w, y+100], outline="#E5E7EB", width=2)
-        draw.text((x+15, y+15), label.upper(), font=F_LBL, fill="#9CA3AF")
-        draw.text((x+15, y+45), str(val), font=F_VAL, fill="#111827")
+    # Header
+    # Deep Navy like original: #0A192F or linear-gradient approximation
+    draw.rectangle([0, 0, W, 130], fill="#0A192F")
+    draw.text((48, 40), "Student Report", font=F_H1, fill="#FFFFFF")
+    draw.text((48, 88), f"AI ENGINEERING BOOTCAMP • BATCH {req.batch}", font=F_SUB, fill="#3B82F6")
+    
+    # Grid/Margins
+    margin_x = 48
+    y_info = 170
+    info_h = 105
+    w_info = W - 2 * margin_x
+    
+    # Helper to format float to int if no decimal
+    def fmt_sc(val):
+        try:
+            f = float(val)
+            return str(int(f)) if f.is_integer() else str(f)
+        except:
+            return str(val)
 
-    box(50,  "Student Name", req.name, 350)
-    # Subtitle for name box
-    draw.text((50+15, y+75), f"Batch {req.batch} · AI Engineering Bootcamp", font=get_font_report(FONT_PATH_REG, 11), fill="#6B7280")
+    # Main box
+    draw.rectangle([margin_x, y_info, margin_x+w_info, y_info+info_h], outline="#E2E8F0", width=2, fill="#FFFFFF")
     
-    box(410, "Student ID", req.student_id, 150)
-    box(570, "Score", str(req.current_score), 100)
-    box(680, "Grade", req.current_grade, 100)
-    
-    # Badge
+    # Columns proportions (approx: 380, 174, 100, 100) -> Total 754
+    col_w = [400, 164, 95, 95]
+    cum_x = margin_x
+    for i, cw in enumerate(col_w):
+        if i > 0:
+            draw.line([(cum_x, y_info), (cum_x, y_info+info_h)], fill="#E2E8F0", width=1)
+        
+        label_y = y_info + 18
+        if i == 0:
+            draw.text((cum_x + 20, label_y), "STUDENT NAME", font=F_LABEL, fill="#94A3B8")
+            name_text = truncate_text(draw, req.name, F_VAL_NAME, cw - 40)
+            draw.text((cum_x + 20, y_info + 38), name_text, font=F_VAL_NAME, fill="#0F172A")
+            draw.text((cum_x + 20, y_info + 68), f"Batch {req.batch} · AI Engineering Bootcamp", font=get_font_report(FONT_PATH_REG, 11), fill="#94A3B8")
+        elif i == 1:
+            draw.text((cum_x + 20, label_y), "STUDENT ID", font=F_LABEL, fill="#94A3B8")
+            draw.text((cum_x + 20, y_info + 42), req.student_id, font=F_VAL_ID, fill="#0F172A")
+        elif i == 2:
+            draw.text((cum_x + 20, label_y), "SCORE", font=F_LABEL, fill="#94A3B8")
+            draw.text((cum_x + 20, y_info + 40), fmt_sc(req.current_score), font=F_VAL_BIG, fill="#2563EB")
+        elif i == 3:
+            draw.text((cum_x + 20, label_y), "GRADE", font=F_LABEL, fill="#94A3B8")
+            draw.text((cum_x + 20, y_info + 40), str(req.current_grade), font=F_VAL_BIG, fill="#0F172A")
+        cum_x += cw
+
+    # Status Badge below container
     st = str(req.current_status).upper()
-    bc = {"PASSED": ("#DCFCE7","#166534"), "FAILED": ("#FEE2E2","#991B1B")}.get(st, ("#F3F4F6","#374151"))
-    draw.rounded_rectangle([50, 330, 200, 360], radius=5, fill=bc[0])
-    draw.text((125, 345), st, font=get_font_report(FONT_PATH_BOLD, 12), fill=bc[1], anchor="mm")
+    badge_colors = {
+        "PASSED": ("#DCFCE7", "#166534"),
+        "FAILED": ("#FEE2E2", "#991B1B"),
+        "NEED IMPROVEMENT": ("#FEF9C3", "#854D0E"),
+        "NEED ASSISTANCE": ("#FFEDD5", "#9A3412")
+    }
+    bg_c, fg_c = badge_colors.get(st, ("#F1F5F9", "#475569"))
+    
+    b_w = 120
+    b_h = 26
+    b_y = y_info + info_h + 16
+    draw.rounded_rectangle([margin_x, b_y, margin_x + b_w, b_y + b_h], radius=6, fill=bg_c)
+    draw.text((margin_x + b_w/2, b_y + b_h/2 - 1), st, font=get_font_report(FONT_PATH_BOLD, 10), fill=fg_c, anchor="mm")
 
-    # Table: Attendance 
-    ty = 400
-    draw.rectangle([50, ty, W-50, ty+40], fill="#F9FAFB")
-    draw.line([(50, ty), (50, ty+40)], fill="#3B82F6", width=5)
-    draw.text((65, ty+10), "ATTENDANCE & PROJECT RECAP", font=get_font_report(FONT_PATH_BOLD, 18), fill="#111827")
-    
-    hy = ty + 50
-    draw.text((65, hy), "COURSE MODULE", font=F_LBL, fill="#6B7280")
-    draw.text((W-300, hy), "ATTENDANCE", font=F_LBL, fill="#6B7280")
-    draw.text((W-150, hy), "SCORE", font=F_LBL, fill="#6B7280")
-    
-    ry = hy + 30
+    # Section 1: Attendance & Project Recap
+    y_sec = b_y + b_h + 30
+    draw.rectangle([margin_x, y_sec, W-margin_x, y_sec+36], fill="#F8FAFC")
+    draw.rectangle([margin_x, y_sec, margin_x+4, y_sec+36], fill="#2563EB")
+    draw.text((margin_x + 20, y_sec + 10), "ATTENDANCE & PROJECT RECAP", font=F_SEC_TITLE, fill="#0F172A")
+
+    y_th = y_sec + 50
+    draw.text((margin_x + 20, y_th), "COURSE MODULE", font=F_TH, fill="#64748B")
+    draw.text((W - 200, y_th), "ATTENDANCE", font=F_TH, fill="#64748B", anchor="ma")
+    draw.text((W - margin_x - 30, y_th), "SCORE", font=F_TH, fill="#64748B", anchor="ma")
+    draw.line([(margin_x, y_th + 20), (W-margin_x, y_th + 20)], fill="#E2E8F0", width=1)
+
+    ry = y_th + 36
     def fv(v): s=str(v).strip(); return "—" if not s or s in ("","-1","-","—") else s
     rows = [
-        ("Course 1 - Python", "1", fv(req.prj1)), ("Course 2 - Vibe Coding", "1", fv(req.prj2)),
-        ("Course 3 - Machine Learning", "1", fv(req.prj3)), ("Course 4 - Deep Learning", "1", fv(req.prj4)),
-        ("Course 5 - Visual Model", "1", "—"), ("Course 6 - Large Language Model", "1", "—"),
+        ("Course 1 - Python", "1", fv(req.prj1)), 
+        ("Course 2 - Vibe Coding", "1", fv(req.prj2)),
+        ("Course 3 - Machine Learning", "1", fv(req.prj3)), 
+        ("Course 4 - Deep Learning", "1", fv(req.prj4)),
+        ("Course 5 - Visual Model", "1", "—"), 
+        ("Course 6 - Large Language Model", "1", "—"),
         ("Course 7 - Agentic AI", "1", "—")
     ]
     for m, a, p in rows:
-        draw.text((65, ry), m, font=F_BODY, fill="#374151")
-        draw.text((W-250, ry), a, font=F_B_B, fill="#111827", anchor="mm")
-        draw.text((W-120, ry), p, font=F_B_B, fill="#111827", anchor="mm")
-        ry += 40
+        draw.text((margin_x + 20, ry), m, font=get_font_report(FONT_PATH_REG, 13), fill="#334155")
+        draw.text((W - 200, ry+6), str(a), font=get_font_report(FONT_PATH_BOLD, 13), fill="#0F172A", anchor="mm")
+        color_p = "#94A3B8" if p == "—" else "#0F172A"
+        draw.text((W - margin_x - 30, ry+6), str(p), font=get_font_report(FONT_PATH_BOLD, 13), fill=color_p, anchor="mm")
+        ry += 38
 
-    # Score Recap
-    sy = ry + 20
-    draw.rectangle([50, sy, W-50, sy+40], fill="#F9FAFB")
-    draw.text((65, sy+10), "SCORE RECAP", font=get_font_report(FONT_PATH_BOLD, 18), fill="#111827")
-    sy += 50
-    recap = [("Pre Test", req.pre_test), ("Post Test", req.post_test), ("Attendance", req.atc_accum), ("Capstone", req.fp)]
+    # Section 2: Two Column Layout (Score Recap + Grading Scale)
+    ry += 10
+    col_w = (W - 2 * margin_x - 22) // 2 # 22px gap
+    
+    x_left = margin_x
+    x_right = margin_x + col_w + 22
+
+    # Titles
+    draw.rectangle([x_left, ry, x_left + col_w, ry+36], fill="#F8FAFC")
+    draw.rectangle([x_left, ry, x_left+4, ry+36], fill="#2563EB")
+    draw.text((x_left + 20, ry+10), "SCORE RECAP", font=F_SEC_TITLE, fill="#0F172A")
+    
+    draw.rectangle([x_right, ry, x_right + col_w, ry+36], fill="#F8FAFC")
+    draw.rectangle([x_right, ry, x_right+4, ry+36], fill="#2563EB")
+    draw.text((x_right + 20, ry+10), "GRADING SCALE", font=F_SEC_TITLE, fill="#0F172A")
+
+    # Table Heads
+    y_th2 = ry + 50
+    draw.text((x_left + 20, y_th2), "ASSESSMENT", font=F_TH, fill="#64748B")
+    draw.text((x_left + col_w - 20, y_th2), "SCORE", font=F_TH, fill="#64748B", anchor="ma")
+    draw.line([(x_left, y_th2+20), (x_left + col_w, y_th2+20)], fill="#E2E8F0", width=1)
+
+    draw.text((x_right + 25, y_th2), "GRADE", font=F_TH, fill="#64748B", anchor="ma")
+    draw.text((x_right + 65, y_th2), "RANGE", font=F_TH, fill="#64748B")
+    draw.text((x_right + col_w - 55, y_th2), "STATUS", font=F_TH, fill="#64748B", anchor="ma")
+    draw.line([(x_right, y_th2+20), (x_right + col_w, y_th2+20)], fill="#E2E8F0", width=1)
+
+    # Left Row (Score Recap)
+    ry_left = y_th2 + 36
+    recap = [("Pre Test Score", fv(req.pre_test)), ("Post Test Score", fv(req.post_test)), ("Cumulative Attendance Rate", str(req.atc_accum)), ("Capstone Project", fv(req.fp))]
     for lbl, val in recap:
-        draw.text((65, sy), lbl, font=F_BODY, fill="#374151")
-        draw.text((W-120, sy), fv(val), font=F_B_B, fill="#000000", anchor="mm")
-        sy += 35
+        draw.text((x_left + 20, ry_left), lbl, font=get_font_report(FONT_PATH_REG, 12), fill="#334155")
+        color_val = "#94A3B8" if val == "—" else "#0F172A"
+        draw.text((x_left + col_w - 20, ry_left+6), str(val), font=get_font_report(FONT_PATH_BOLD, 12), fill=color_val, anchor="mm")
+        draw.line([(x_left, ry_left+24), (x_left + col_w, ry_left+24)], fill="#F1F5F9", width=1)
+        ry_left += 34
+
+    # Right Row (Grading Scale)
+    ry_right = y_th2 + 36
+    grades = [
+        ("A", "85 - 100", "Passed", badge_colors["PASSED"]),
+        ("B", "70 - 84.99", "Passed", badge_colors["PASSED"]),
+        ("C", "60 - 69.99", "Need Improvement", badge_colors["NEED IMPROVEMENT"]),
+        ("D", "45 - 59.99", "Need Assistance", badge_colors["NEED ASSISTANCE"]),
+        ("E", "< 45", "Failed", badge_colors["FAILED"])
+    ]
+    for g, r, s_text, (bg, fg) in grades:
+        # Tag
+        draw.rounded_rectangle([x_right + 12, ry_right - 4, x_right + 38, ry_right + 18], radius=6, fill="#0F172A")
+        draw.text((x_right + 25, ry_right + 7), g, font=get_font_report(FONT_PATH_BOLD, 12), fill="#FFFFFF", anchor="mm")
+        
+        # Range
+        draw.text((x_right + 65, ry_right), r, font=get_font_report(FONT_PATH_REG, 11), fill="#64748B")
+        
+        # Status Label
+        b_w = 100
+        draw.rounded_rectangle([x_right + col_w - b_w - 5, ry_right - 4, x_right + col_w - 5, ry_right + 18], radius=5, fill=bg)
+        draw.text((x_right + col_w - b_w/2 - 5, ry_right + 7), s_text, font=get_font_report(FONT_PATH_BOLD, 9), fill=fg, anchor="mm")
+        
+        draw.line([(x_right, ry_right+26), (x_right + col_w, ry_right+26)], fill="#F1F5F9", width=1)
+        ry_right += 32
 
     buf = io.BytesIO(); img.save(buf, format="PNG", quality=95); buf.seek(0)
     return buf.read()
