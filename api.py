@@ -306,10 +306,10 @@ def draw_report_v4(req: ReportRequest):
     draw_cell(draw, margin_x+c1_w+c2_w+c3_w, y_grid, c4_w, r_h, str(req.current_status).title(), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
     # --- 3. ATTENDANCE & PROJECT RECAP ---
-    y_sec2 = y_grid + 48
-    r_h = 44
-    draw_cell(draw, margin_x, y_sec2, w_main, r_h, "Attendance & Project Recap", F_TITLE, C_DARK, "#FFFFFF")
-    y_sec2 += r_h
+    y_sec2 = y_grid + r_h + 40 # Added gap after row 3!
+    r_h_inner = 44
+    draw_cell(draw, margin_x, y_sec2, w_main, r_h_inner, "Attendance & Project Recap", F_TITLE, C_DARK, "#FFFFFF")
+    y_sec2 += r_h_inner
 
     t_margin = margin_x + 60
     t_w = W - 2 * t_margin
