@@ -8,38 +8,35 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 
 FONT_PATH_REG  = "PlusJakartaSans-Regular.ttf"
-FONT_PATH_BOLD = "PlusJakartaSans-Bold.ttf"
 
 # From pixel analysis:
-# Line 1 (gray):  "This credential verifies..."       y=1382-1394
+# Line 1 (gray):  "This credential verifies..."       y=1382-1394, font ~16px
 # Line 2 (gray):  "completion of the boot camp."      y=1413-1430
-# Line 3 (blue):  "Verify authenticity at ..."        y=1447-1475
-# Font height of line 3 ≈ 28px.
+# Line 3 (blue):  "Verify authenticity at ..."        y=1447-1475, rightmost x=1130
+#
+# We need to erase EVERYTHING in line 3's band (including any previous patches)
+# and rewrite it at the matching font size.
 
-# We want to:
-#   1. Erase line 3 completely (fill with background colour)
-#   2. Write a new line 3 with the same approximate font size but correct URL
-#   
-# Lines 1 & 2 are left as-is (they are already correct).
-
-BG_COLOR   = "#e0f4fe"   # Background gradient colour at the footer area
-GRAY_COLOR = "#94a3b8"   # Same muted colour as original gray text
+BG_COLOR   = "#e0f4fe"   # Background gradient colour at footer area
+GRAY_COLOR = "#94a3b8"   # Same muted grey as "Verify authenticity at"
 BLUE_COLOR = "#0284c7"   # Same blue as original link
 
-ERASE_RECT = (260, 1435, 800, 1485)  # Covers line 3 including descenders
-TEXT_Y     = 1445                    # Baseline for new text (top of glyph)
-TEXT_X     = 273                     # Left margin
-FONT_SIZE  = 27                      # Matches the ~28px character height found in scan
+# Erase rect — wider than rightmost detected pixel to be safe
+ERASE_RECT = (260, 1435, 1160, 1490)
+
+TEXT_Y     = 1447    # Top of glyph for new text
+TEXT_X     = 273     # Left margin
+FONT_SIZE  = 16      # Matches gray text height from pixel analysis
 
 
 def patch(img_path: str) -> None:
     img  = Image.open(img_path).convert("RGB")
     draw = ImageDraw.Draw(img)
 
-    # ── 1. Erase old blue URL ────────────────────────────────────────────
+    # ── 1. Erase old URL (and any previous patch attempt) ──────────────
     draw.rectangle(list(ERASE_RECT), fill=BG_COLOR)
 
-    # ── 2. Write replacement text ────────────────────────────────────────
+    # ── 2. Write replacement text ──────────────────────────────────────
     try:
         font = ImageFont.truetype(FONT_PATH_REG, FONT_SIZE)
     except Exception:
@@ -62,4 +59,4 @@ if __name__ == "__main__":
             patch(tmpl)
         else:
             print(f"SKIP: {tmpl} not found")
-    print("\nDone! Commit the patched PNGs to git.")
+    print("\nDone!")
