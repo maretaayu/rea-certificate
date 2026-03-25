@@ -41,6 +41,10 @@ app = FastAPI(
 )
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
+def make_cert_id(batch: str) -> str:
+    chars = string.ascii_uppercase + string.digits
+    return f"REAENG{batch}" + ''.join(random.choices(chars, k=5))
+
 class CertRequest(BaseModel):
     name: str; student_id: str; batch: str = BATCH
     atc_accum: Union[str, float] = "0%"; current_score: Union[str, float] = 0
@@ -141,10 +145,11 @@ def cert(req: CertRequest):
     draw.text((260, 620), req.name, font=get_font(FONT_BOLD, 80), fill="#1e293b")
     
     # 2. Detailed Description ("Passed" etc)
+    score_fmt = int(score) if score == int(score) else score
     if is_coe:
         desc = (
             f"For demonstrating exceptional dedication and successfully fulfilling all curriculum requirements "
-            f"with a score of {score}, thereby earning the grade of {req.current_grade} in the following program:"
+            f"with a score of {score_fmt}, thereby earning the grade of {req.current_grade} in the following program:"
         )
     else:
         desc = (
@@ -154,21 +159,13 @@ def cert(req: CertRequest):
         )
     
     # Wrap text and draw
-    desc_wrapped = textwrap.fill(desc, width=90)
-    draw.multiline_text((260, 750), desc_wrapped, font=get_font(FONT_REG, 24), fill="#334155", spacing=10)
-
-    # 3. Program Name / Batch Info
-    prog_text = f"AI Engineering Bootcamp Batch {req.batch}"
-    draw.text((260, 920), prog_text, font=get_font(FONT_BOLD, 40), fill="#1e293b")
+    desc_wrapped = textwrap.fill(desc, width=80)
+    draw.multiline_text((260, 750), desc_wrapped, font=get_font(FONT_REG, 32), fill="#334155", spacing=12)
     
-    # 4. Date
-    date_text = "Jakarta, 23 Maret 2026"
-    draw.text((260, 1680), date_text, font=get_font(FONT_BOLD, 28), fill="#1e293b")
-    
-    # 4. Signature Tag (Alvin Francis Tamie)
-    # In the image it's bottom right.
-    # Not adding signature drawing yet as it requires an asset path in logic,
-    # but the text is usually there in template.
+    # 2. Credential ID
+    cert_id = make_cert_id(req.batch)
+    # Positioning for top right (approx based on template layout)
+    draw.text((2150, 410), cert_id, font=get_font(FONT_BOLD, 24), fill="#3B82F6")
 
     buf = io.BytesIO()
     img.save(buf, format="PNG", quality=95)
