@@ -209,8 +209,8 @@ def draw_report_v4(req: ReportRequest):
         try: return ImageFont.truetype(path, size)
         except: return ImageFont.load_default()
 
-    # Create Canvas (A4 Ratio with extra padding)
-    W, H = 850, 1220
+    # Create Canvas (Increased height to prevent cutting)
+    W, H = 850, 1350
     img = Image.new('RGB', (W, H), '#FFFFFF')
     draw = ImageDraw.Draw(img)
 
@@ -224,11 +224,11 @@ def draw_report_v4(req: ReportRequest):
     F_TITLE = get_font_report(FONT_PATH_BOLD, 15)
 
     # Colors
-    C_DARK = "#0F172A" # Very deep slate for premium feel
-    C_LIGHT = "#F8FAFC" # Soft background for labels
-    C_BORDER = "#E2E8F0" # Clean borders
-    C_TEXT = "#475569" # Readable gray for body text
-    C_TEXT_BOLD = "#0F172A" # Deep slate for values
+    C_DARK = "#0F172A"
+    C_LIGHT = "#F8FAFC"
+    C_BORDER = "#E2E8F0"
+    C_TEXT = "#475569"
+    C_TEXT_BOLD = "#0F172A"
 
     # --- 1. HEADER ---
     header_h = 140
@@ -239,29 +239,23 @@ def draw_report_v4(req: ReportRequest):
     try:
         def prepare_logo(path, target_h):
             logo = Image.open(path).convert("RGBA")
-            # Make it white
             alpha = logo.split()[3]
             white = Image.new('RGB', logo.size, (255, 255, 255))
             white_logo = Image.merge('RGBA', (white.split()[0], white.split()[1], white.split()[2], alpha))
             ratio = target_h / float(logo.size[1])
             new_size = (int(float(logo.size[0]) * ratio), target_h)
             return white_logo.resize(new_size, Image.Resampling.LANCZOS)
-
         l_rea_w = prepare_logo('assets/Logo REA (black).png', 42)
         l_sa_w = prepare_logo('assets/Logo SA Pro (black).png', 42)
-
         sa_x = W - 60 - l_sa_w.width
         sa_y = header_h // 2 - l_sa_w.height // 2
         img.paste(l_sa_w, (sa_x, sa_y), l_sa_w)
-
         sep_x = sa_x - 18
         draw.line([(sep_x, sa_y + 4), (sep_x, sa_y + l_sa_w.height - 4)], fill="#FFFFFF", width=1)
-
         rea_x = sep_x - 18 - l_rea_w.width
         rea_y = header_h // 2 - l_rea_w.height // 2
         img.paste(l_rea_w, (rea_x, rea_y), l_rea_w)
-    except Exception as e:
-        print(f"Logo error: {e}")
+    except Exception as e: print(f"Logo error: {e}")
 
     def draw_cell(draw, x, y, w, h, text, font, bg_color, text_color, align="center"):
         draw.rectangle([x, y, x+w, y+h], fill=bg_color, outline=C_BORDER, width=1)
@@ -273,10 +267,12 @@ def draw_report_v4(req: ReportRequest):
     margin_x = 60
     w_main = W - 2 * margin_x
 
-    # --- 2. TOP GRID (3 rows) ---
+    # --- 2. TOP GRID (Row-based Bio & Academic) ---
     y_grid = header_h + 40
-    r_h = 52 # Breathable row height
-    c1_w, c2_w, c3_w, c4_w = int(w_main*0.22), int(w_main*0.42), int(w_main*0.18), int(w_main*0.18)
+    r_h = 52
+    col_w = w_main // 2
+    lbl_w = int(col_w * 0.38)
+    val_w = col_w - lbl_w
 
     def fv(v): s=str(v).strip(); return "-" if s in ("", "-1", "—", "None") or not s else s
     def fmt_sc(val):
@@ -286,38 +282,35 @@ def draw_report_v4(req: ReportRequest):
         except: return str(val)
 
     # Row 1
-    draw_cell(draw, margin_x, y_grid, c1_w, r_h, "Student Name", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+c1_w, y_grid, c2_w, r_h, req.name, F_VAL, "#FFFFFF", C_TEXT_BOLD)
-    draw_cell(draw, margin_x+c1_w+c2_w, y_grid, c3_w, r_h, "Current Score", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+c1_w+c2_w+c3_w, y_grid, c4_w, r_h, "CCGPA", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x, y_grid, lbl_w, r_h, "Student Name", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+lbl_w, y_grid, val_w, r_h, req.name, F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x+col_w, y_grid, lbl_w, r_h, "Current Score", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+col_w+lbl_w, y_grid, val_w, r_h, fmt_sc(req.current_score), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
     # Row 2
     y_grid += r_h
-    draw_cell(draw, margin_x, y_grid, c1_w, r_h, "Student ID", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+c1_w, y_grid, c2_w, r_h, req.student_id, F_VAL, "#FFFFFF", C_TEXT_BOLD)
-    draw_cell(draw, margin_x+c1_w+c2_w, y_grid, c3_w, r_h, fmt_sc(req.current_score), F_VAL, "#FFFFFF", C_TEXT_BOLD)
-    draw_cell(draw, margin_x+c1_w+c2_w+c3_w, y_grid, c4_w, r_h, fv(req.current_grade), F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x, y_grid, lbl_w, r_h, "Student ID", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+lbl_w, y_grid, val_w, r_h, req.student_id, F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x+col_w, y_grid, lbl_w, r_h, "CCGPA", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+col_w+lbl_w, y_grid, val_w, r_h, fv(req.current_grade), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
     # Row 3
     y_grid += r_h
-    draw_cell(draw, margin_x, y_grid, c1_w, r_h, "Program", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+c1_w, y_grid, c2_w, r_h, f"AI Engineering Bootcamp Batch {req.batch}", F_VAL, "#FFFFFF", C_TEXT_BOLD)
-    draw_cell(draw, margin_x+c1_w+c2_w, y_grid, c3_w, r_h, "Status", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+c1_w+c2_w+c3_w, y_grid, c4_w, r_h, str(req.current_status).title(), F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x, y_grid, lbl_w, r_h, "Program", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+lbl_w, y_grid, val_w, r_h, f"AI Engineering Bootcamp", F_VAL, "#FFFFFF", C_TEXT_BOLD)
+    draw_cell(draw, margin_x+col_w, y_grid, lbl_w, r_h, "Status", F_TH, C_LIGHT, C_TEXT)
+    draw_cell(draw, margin_x+col_w+lbl_w, y_grid, val_w, r_h, str(req.current_status).title(), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
-    # --- 3. ATTENDANCE & PROJECT RECAP ---
-    y_sec2 = y_grid + r_h + 40 # Added gap after row 3!
-    r_h_inner = 44
-    draw_cell(draw, margin_x, y_sec2, w_main, r_h_inner, "Attendance & Project Recap", F_TITLE, C_DARK, "#FFFFFF")
-    y_sec2 += r_h_inner
+    # --- 3. ATTENDANCE & PROJECT RECAP (Full Width) ---
+    y_sec2 = y_grid + r_h + 50 
+    draw.text((margin_x, y_sec2), "Attendance & Project Recap", font=F_TITLE, fill=C_TEXT_BOLD)
+    y_sec2 += 34 # Gap below title
 
-    t_margin = margin_x + 60
-    t_w = W - 2 * t_margin
-    t2_c1, t2_c2, t2_c3 = int(t_w*0.5), int(t_w*0.25), t_w - int(t_w*0.5) - int(t_w*0.25)
-
-    draw_cell(draw, t_margin, y_sec2, t2_c1, r_h, "Course Name", F_TH, C_DARK, "#FFFFFF")
-    draw_cell(draw, t_margin+t2_c1, y_sec2, t2_c2, r_h, "Attendance", F_TH, C_DARK, "#FFFFFF")
-    draw_cell(draw, t_margin+t2_c1+t2_c2, y_sec2, t2_c3, r_h, "Project", F_TH, C_DARK, "#FFFFFF")
+    # Header Recap
+    c1, c2, c3 = int(w_main*0.45), int(w_main*0.25), w_main - int(w_main*0.45) - int(w_main*0.25)
+    draw_cell(draw, margin_x, y_sec2, c1, r_h, "Course Name", F_TH, C_DARK, "#FFFFFF")
+    draw_cell(draw, margin_x+c1, y_sec2, c2, r_h, "Attendance", F_TH, C_DARK, "#FFFFFF")
+    draw_cell(draw, margin_x+c1+c2, y_sec2, c3, r_h, "Project", F_TH, C_DARK, "#FFFFFF")
     y_sec2 += r_h
 
     def fmt_atc(val):
@@ -337,50 +330,51 @@ def draw_report_v4(req: ReportRequest):
         ("Course 7 - Speech Model & Agentic AI", req.atr7, "-")
     ]
     for m, a, p in rows:
-        draw_cell(draw, t_margin, y_sec2, t2_c1, r_h, m, F_VAL_B, "#FFFFFF", C_TEXT_BOLD, align="center")
-        draw_cell(draw, t_margin+t2_c1, y_sec2, t2_c2, r_h, fmt_atc(a), F_VAL, "#FFFFFF", C_TEXT)
-        draw_cell(draw, t_margin+t2_c1+t2_c2, y_sec2, t2_c3, r_h, fv(p), F_VAL, "#FFFFFF", C_TEXT)
+        draw_cell(draw, margin_x, y_sec2, c1, r_h, m, F_VAL_B, "#FFFFFF", C_TEXT_BOLD, align="center")
+        draw_cell(draw, margin_x+c1, y_sec2, c2, r_h, fmt_atc(a), F_VAL, "#FFFFFF", C_TEXT)
+        draw_cell(draw, margin_x+c1+c2, y_sec2, c3, r_h, fv(p), F_VAL, "#FFFFFF", C_TEXT)
         y_sec2 += r_h
 
     # --- 4. SCORE RECAP & GRADING SCALE ---
-    y_sec3 = y_sec2 + 48
-    draw_cell(draw, margin_x, y_sec3, w_main, r_h, "Score Recap & Grading Scale", F_TITLE, C_DARK, "#FFFFFF")
-    y_sec3 += r_h
-
+    y_sec3 = y_sec2 + 50
+    draw.text((margin_x, y_sec3), "Score Recap & Grading Scale", font=F_TITLE, fill=C_TEXT_BOLD)
+    y_sec3 += 34
+    
+    r_h_inner = 44 # Maintain 44 for inner tables
     gap = 20
-    t_w3 = (w_main - gap) // 2
-    x_left, x_right = margin_x, margin_x + t_w3 + gap
+    t_w = (w_main - gap) // 2
+    x_L, x_R = margin_x, margin_x + t_w + gap
 
     # Score Recap
-    s_c1 = int(t_w3 * 0.6)
-    s_c2 = t_w3 - s_c1
-    draw_cell(draw, x_left, y_sec3, s_c1, r_h, "Score", F_TH, C_DARK, "#FFFFFF")
-    draw_cell(draw, x_left+s_c1, y_sec3, s_c2, r_h, "Score", F_TH, C_DARK, "#FFFFFF")
-    y_left = y_sec3 + r_h
+    s1, s2 = int(t_w * 0.6), t_w - int(t_w * 0.6)
+    draw_cell(draw, x_L, y_sec3, s1, r_h_inner, "Score", F_TH, C_DARK, "#FFFFFF")
+    draw_cell(draw, x_L+s1, y_sec3, s2, r_h_inner, "Score", F_TH, C_DARK, "#FFFFFF")
+    y_L = y_sec3 + r_h_inner
     recap = [("Pre Test Score", fv(req.pre_test)), ("Post Test Score", fv(req.post_test)), ("Cumulative Attendance Rate", fmt_atc(req.atc_accum)), ("Capstone Project", fv(req.fp))]
     for lbl, val in recap:
-        draw_cell(draw, x_left, y_left, s_c1, r_h, lbl, F_VAL_B, C_LIGHT, C_TEXT_BOLD, align="center")
-        draw_cell(draw, x_left+s_c1, y_left, s_c2, r_h, str(val), F_VAL, "#FFFFFF", C_TEXT)
-        y_left += r_h
+        draw_cell(draw, x_L, y_L, s1, r_h_inner, lbl, F_VAL_B, C_LIGHT, C_TEXT_BOLD, align="center")
+        draw_cell(draw, x_L+s1, y_L, s2, r_h_inner, str(val), F_VAL, "#FFFFFF", C_TEXT)
+        y_L += r_h_inner
 
     # Grading Scale
-    draw_cell(draw, x_right, y_sec3, t_w3, r_h, "Grading Scale", F_TH, C_LIGHT, C_TEXT_BOLD)
-    y_right = y_sec3 + r_h
+    draw_cell(draw, x_R, y_sec3, t_w, r_h_inner, "Grading Scale", F_TH, C_LIGHT, C_TEXT_BOLD)
+    y_R = y_sec3 + r_h_inner
     badge_colors = {"PASSED": ("#DCFCE7", "#166534"), "FAILED": ("#FEE2E2", "#991B1B"), "NEED IMPROVEMENT": ("#FEF9C3", "#854D0E"), "NEED ASSISTANCE": ("#FFEDD5", "#9A3412")}
     grades = [("A", "85 - 100", "PASSED", badge_colors["PASSED"]), ("B", "70 - 84.99", "PASSED", badge_colors["PASSED"]), ("C", "60 - 69.99", "NEED IMPROVEMENT", badge_colors["NEED IMPROVEMENT"]), ("D", "45 - 59.99", "NEED ASSISTANCE", badge_colors["NEED ASSISTANCE"]), ("E", "< 45", "FAILED", badge_colors["FAILED"])]
-    g_c1, g_c2, g_c3 = int(t_w3 * 0.15), int(t_w3 * 0.35), int(t_w3 * 0.5)
-    for g, r, s_text, (bg, fg) in grades:
-        draw_cell(draw, x_right, y_right, g_c1, r_h, "", F_VAL, "#FFFFFF", C_TEXT)
-        draw.rounded_rectangle([x_right + 10, y_right + 8, x_right + g_c1 - 10, y_right + r_h - 8], radius=4, fill=C_DARK)
-        draw.text((x_right + g_c1/2, y_right + r_h/2 - 1), g, font=F_GRADE, fill="#FFFFFF", anchor="mm")
-        draw_cell(draw, x_right+g_c1, y_right, g_c2, r_h, r, F_VAL, "#FFFFFF", C_TEXT)
-        draw_cell(draw, x_right+g_c1+g_c2, y_right, g_c3, r_h, "", F_VAL, "#FFFFFF", C_TEXT)
-        draw.rounded_rectangle([x_right+g_c1+g_c2 + 10, y_right + 8, x_right+g_c1+g_c2 + g_c3 - 10, y_right + r_h - 8], radius=6, fill=bg)
-        draw.text((x_right+g_c1+g_c2 + g_c3/2, y_right + r_h/2 - 1), s_text.title() if s_text != "PASSED" else "Passed", font=F_BADGE, fill=fg, anchor="mm")
-        y_right += r_h
+    g1, g2, g3 = int(t_w * 0.15), int(t_w * 0.35), int(t_w * 0.5)
+    for g, r, s, (bg, fg) in grades:
+        draw_cell(draw, x_R, y_R, g1, r_h_inner, "", F_VAL, "#FFFFFF", C_TEXT)
+        draw.rounded_rectangle([x_R+10, y_R+8, x_R+g1-10, y_R+r_h_inner-8], radius=4, fill=C_DARK)
+        draw.text((x_R+g1/2, y_R+r_h_inner/2-1), g, font=F_GRADE, fill="#FFFFFF", anchor="mm")
+        draw_cell(draw, x_R+g1, y_R, g2, r_h_inner, r, F_VAL, "#FFFFFF", C_TEXT)
+        draw_cell(draw, x_R+g1+g2, y_R, g3, r_h_inner, "", F_VAL, "#FFFFFF", C_TEXT)
+        draw.rounded_rectangle([x_R+g1+g2+10, y_R+8, x_R+g1+g2+g3-10, y_R+r_h_inner-8], radius=6, fill=bg)
+        draw.text((x_R+g1+g2+g3/2, y_R+r_h_inner/2-1), s.title() if s != "PASSED" else "Passed", font=F_BADGE, fill=fg, anchor="mm")
+        y_R += r_h_inner
 
     buf = io.BytesIO(); img.save(buf, format="PNG", quality=95); buf.seek(0)
     return buf.read()
+
 
 def get_font_report(path, size):
     try: return ImageFont.truetype(path, size)
