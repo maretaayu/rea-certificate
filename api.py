@@ -301,7 +301,7 @@ def draw_report_v4(req: ReportRequest):
     # Row 3
     y_grid += r_h
     draw_cell(draw, margin_x, y_grid, l_lbl_w, r_h, "Program", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, "AI Engineering Bootcamp Batch 11", F_VAL, "#FFFFFF", C_TEXT_BOLD, align="left")
+    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, "AI Engineering Bootcamp Batch 10", F_VAL, "#FFFFFF", C_TEXT_BOLD, align="left")
     draw_cell(draw, margin_x+w_left, y_grid, r_lbl_w, r_h, "Status", F_TH, C_LIGHT, C_TEXT)
     draw_cell(draw, margin_x+w_left+r_lbl_w, y_grid, r_val_w, r_h, str(req.current_status).title(), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
