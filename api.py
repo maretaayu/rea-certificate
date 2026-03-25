@@ -158,9 +158,8 @@ def draw_cert_image(
     else:  # COC
         img_path = TEMPLATE_COC
         desc = (
-            f"For demonstrating strong commitment and successfully fulfilling the attendance requirements "
-            f"with an accumulation score of <b>{atc_str}</b> throughout the sessions, thereby earning the status "
-            f"of <b>PASSED</b> in the following program:"
+            f"For actively participating and demonstrating commitment by fulfilling the cumulative attendance "
+            f"requirement of <b>{atc_str}</b> throughout the sessions of the following program:"
         )
 
     # Buka gambar template
