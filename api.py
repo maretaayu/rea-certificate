@@ -406,8 +406,10 @@ def generate_cert(req: CertRequest, filename: Optional[str] = None, format: Opti
 
     if cert_type == "COE" and score_val < 70:
         raise HTTPException(status_code=400, detail="COE requires Current Score >= 70")
-    if cert_type == "COC" and atc_val < 70:
-        raise HTTPException(status_code=400, detail="COC requires Atc (Accum) >= 70%")
+    
+    # Update: Student can get COC if they have score >= 70, even if attendance is < 70%
+    if cert_type == "COC" and atc_val < 70 and score_val < 70:
+        raise HTTPException(status_code=400, detail="COC requires Atc (Accum) >= 70% or Current Score >= 70")
 
     cert_id  = make_cert_id(req.batch)
     png_bytes = draw_cert_image(

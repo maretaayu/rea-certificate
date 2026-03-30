@@ -145,8 +145,8 @@ def main():
         atc_val   = pct_to_float(atc_str)
         score_val = float(score_str) if score_str else 0.0
 
-        gets_coc = atc_val >= 70
         gets_coe = score_val >= 70
+        gets_coc = atc_val >= 70 or gets_coe
         is_best  = (student_id == best_student_id)
 
         issued = []
