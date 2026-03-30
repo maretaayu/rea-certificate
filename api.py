@@ -328,9 +328,12 @@ def draw_report_v4(req: ReportRequest):
         return s
 
     rows = [
-        ("Course 1 - Python", req.atr1, req.prj1), ("Course 2 - Vibe Coding & n8n", req.atr2, req.prj2),
-        ("Course 3 - Machine Learning", req.atr3, req.prj3), ("Course 4 - Deep Learning", req.atr4, req.prj4),
-        ("Course 5 - Visual Model & RAG", req.atr5, "-"), ("Course 6 - Large Language Model", req.atr6, "-"),
+        ("Course 1 - Python", req.atr1, "-"),
+        ("Course 2 - Vibe Coding & n8n", req.atr2, req.prj1),
+        ("Course 3 - Machine Learning", req.atr3, req.prj2),
+        ("Course 4 - Deep Learning", req.atr4, req.prj3),
+        ("Course 5 - Visual Model & RAG", req.atr5, req.prj4),
+        ("Course 6 - Large Language Model", req.atr6, "-"),
         ("Course 7 - Speech Model & Agentic AI", req.atr7, "-")
     ]
     for m, a, p in rows:
