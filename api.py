@@ -280,10 +280,10 @@ def draw_report_v4(req: ReportRequest):
 
     def fv(v): s=str(v).strip(); return "-" if s in ("", "-1", "—", "None") or not s else s
     def fmt_sc(val):
-        try:
-            f = float(val)
-            return str(int(f)) if f.is_integer() else str(f)
-        except: return str(val)
+        s = str(val).strip()
+        if s in ("", "-1", "—", "None", "-") or not s: return "-"
+        try: return str(int(round(float(s))))
+        except: return s
 
     # Row 1
     draw_cell(draw, margin_x, y_grid, l_lbl_w, r_h, "Student Name", F_TH, C_LIGHT, C_TEXT)
@@ -339,7 +339,7 @@ def draw_report_v4(req: ReportRequest):
     for m, a, p in rows:
         draw_cell(draw, margin_x, y_sec2, c1, r_h, m, F_VAL_B, "#FFFFFF", C_TEXT_BOLD, align="center")
         draw_cell(draw, margin_x+c1, y_sec2, c2, r_h, fmt_atc(a), F_VAL, "#FFFFFF", C_TEXT)
-        draw_cell(draw, margin_x+c1+c2, y_sec2, c3, r_h, fv(p), F_VAL, "#FFFFFF", C_TEXT)
+        draw_cell(draw, margin_x+c1+c2, y_sec2, c3, r_h, fmt_sc(p), F_VAL, "#FFFFFF", C_TEXT)
         y_sec2 += r_h
 
     # --- 4. SCORE RECAP & GRADING SCALE ---
@@ -357,7 +357,7 @@ def draw_report_v4(req: ReportRequest):
     draw_cell(draw, x_L, y_sec3, s1, r_h_inner, "Score", F_TH, C_DARK, "#FFFFFF")
     draw_cell(draw, x_L+s1, y_sec3, s2, r_h_inner, "Score", F_TH, C_DARK, "#FFFFFF")
     y_L = y_sec3 + r_h_inner
-    recap = [("Pre Test Score", fv(req.pre_test)), ("Post Test Score", fv(req.post_test)), ("Cumulative Attendance Rate", fmt_atc(req.atc_accum)), ("Capstone Project", fv(req.fp))]
+    recap = [("Pre Test Score", fmt_sc(req.pre_test)), ("Post Test Score", fmt_sc(req.post_test)), ("Cumulative Attendance Rate", fmt_atc(req.atc_accum)), ("Capstone Project", fmt_sc(req.fp))]
     for lbl, val in recap:
         draw_cell(draw, x_L, y_L, s1, r_h_inner, lbl, F_VAL_B, C_LIGHT, C_TEXT_BOLD, align="center")
         draw_cell(draw, x_L+s1, y_L, s2, r_h_inner, str(val), F_VAL, "#FFFFFF", C_TEXT)
