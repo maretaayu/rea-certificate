@@ -50,6 +50,7 @@ class ReportRequest(BaseModel):
     atr4          : Union[str, int, float] = ""
     prj4          : Union[str, int, float] = ""
     atr5          : Union[str, int, float] = ""
+    prj5          : Union[str, int, float] = ""
     atr6          : Union[str, int, float] = ""
     atr7          : Union[str, int, float] = ""
 
@@ -64,6 +65,26 @@ def fmt_val(val) -> str:
     except ValueError:
         return s
 
+def fmt_prj(val) -> tuple:
+    """Returns (display_value, dim_class).
+    Logic:
+      - No value / empty / '-' / '—'  → student not submitted → '0'       (no dim)
+      - 'NA' / 'na'                   → deadline not passed   → 'Upcoming' (dim)
+      - numeric >= 0                  → actual score          → str        (no dim)
+    """
+    s = str(val).strip()
+    if not s or s in ('-', '—', '-1'):
+        return ('0', '')                # not submitted = 0
+    if s.upper() == 'NA':
+        return ('Upcoming', 'dim')      # deadline not reached
+    try:
+        f = float(s)
+        if f < 0:
+            return ('0', '')            # negative treated as not submitted
+        return (str(int(f)) if f == int(f) else s, '')
+    except ValueError:
+        return (s, '')
+
 def render_report_html(req: ReportRequest) -> bytes:
     with open(BASE_DIR / 'student-report' / 'index.html', 'r', encoding='utf-8') as f:
         html = f.read()
@@ -77,33 +98,42 @@ def render_report_html(req: ReportRequest) -> bytes:
     }
     status_class = status_classes.get(status_str, "status-passed")
 
-    courses = [
-        (str(req.atr1), fmt_val(req.prj1)),
-        (str(req.atr2), fmt_val(req.prj2)),
-        (str(req.atr3), fmt_val(req.prj3)),
-        (str(req.atr4), fmt_val(req.prj4)),
-        (str(req.atr5), '—'),
-        (str(req.atr6), '—'),
-        (str(req.atr7), '—'),
+    # Courses 2–5 have projects; Course 1,6,7 do not (handled in HTML as —)
+    prj_courses = [
+        (str(req.atr1), None),          # Course 1 — no project
+        (str(req.atr2), req.prj2),      # Course 2
+        (str(req.atr3), req.prj3),      # Course 3
+        (str(req.atr4), req.prj4),      # Course 4
+        (str(req.atr5), req.prj5),      # Course 5
+        (str(req.atr6), None),          # Course 6 — no project
+        (str(req.atr7), None),          # Course 7 — no project
     ]
 
+    post_test_val = fmt_val(req.post_test)
+    fp_val        = fmt_val(req.fp)
+
     replacements = {
-        '{{name}}': str(req.name),
-        '{{student_id}}': str(req.student_id),
-        '{{batch}}': str(req.batch),
-        '{{score}}': str(req.current_score),
-        '{{grade}}': str(req.current_grade),
-        '{{status}}': status_str,
-        '{{status_class}}': status_class,
-        '{{pre_test}}': fmt_val(req.pre_test),
-        '{{post_test}}': fmt_val(req.post_test),
-        '{{atc_accum}}': str(req.atc_accum),
-        '{{fp}}': fmt_val(req.fp),
+        '{{NAME}}':             str(req.name),
+        '{{STUDENT_ID}}':       str(req.student_id),
+        '{{BATCH}}':            str(req.batch),
+        '{{CURRENT_SCORE}}':    str(req.current_score),
+        '{{GRADE}}':            str(req.current_grade),
+        '{{STATUS}}':           status_str,
+        '{{STATUS_TAG_CLASS}}': status_class,
+        '{{PRE_TEST}}':         fmt_val(req.pre_test),
+        '{{POST_TEST}}':        post_test_val,
+        '{{POST_DIM}}':         'dim' if post_test_val in ('—', 'NA') else '',
+        '{{ATC_ACCUM}}':        str(req.atc_accum),
+        '{{FP}}':               fp_val,
+        '{{FP_DIM}}':           'dim' if fp_val in ('—', 'NA') else '',
     }
 
-    for i, (atr, prj) in enumerate(courses, start=1):
-        replacements[f'{{atr{i}}}'] = atr
-        replacements[f'{{prj{i}}}'] = prj
+    for i, (atr, prj_raw) in enumerate(prj_courses, start=1):
+        replacements['{{ATR' + str(i) + '}}'] = atr
+        if prj_raw is not None:
+            val, dim = fmt_prj(prj_raw)
+            replacements['{{PRJ' + str(i) + '}}']         = val
+            replacements['{{PRJ' + str(i) + '_DIM}}']     = dim
 
     for k, v in replacements.items():
         html = html.replace(k, v)

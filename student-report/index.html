@@ -114,7 +114,7 @@
         ═══════════════════════════════════════════════ */
         .info-row {
             display: grid;
-            grid-template-columns: 2fr 1.2fr 1fr 1.2fr;
+            grid-template-columns: 2fr 1.2fr 1fr 1fr 1.2fr;
             border: 1px solid var(--border);
             border-radius: 10px;
             overflow: hidden;
@@ -129,6 +129,11 @@
             position: relative;
         }
         /* Removed blue bar from info cell */
+        .cell-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
         .info-cell:last-child { border-right: none; }
 
         .cell-label {
@@ -328,7 +333,7 @@
                         <tr>
                             <td>Course 1 &middot; Python</td>
                             <td class="c">{{ATR1}}</td>
-                            <td class="c {{PRJ1_DIM}}">{{PRJ1}}</td>
+                            <td class="c dim">&mdash;</td>
                         </tr>
                         <tr>
                             <td>Course 2 &middot; Vibe Coding &amp; n8n</td>
@@ -348,7 +353,7 @@
                         <tr>
                             <td>Course 5 &middot; Visual Model &amp; RAG</td>
                             <td class="c">{{ATR5}}</td>
-                            <td class="c dim">&mdash;</td>
+                            <td class="c {{PRJ5_DIM}}">{{PRJ5}}</td>
                         </tr>
                         <tr>
                             <td>Course 6 &middot; Large Language Model</td>
