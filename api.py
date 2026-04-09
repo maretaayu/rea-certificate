@@ -278,11 +278,26 @@ def draw_report_v4(req: ReportRequest):
     r_lbl_w = int(w_right * 0.5)
     r_val_w = w_right - r_lbl_w
 
-    def fv(v): s=str(v).strip(); return "-" if s in ("", "-1", "—", "None") or not s else s
+    def fv(v): s=str(v).strip(); return "-" if s in ("", "-1", "—", "None", "[empty]") or not s else s
     def fmt_sc(val):
+        """For scores: round to int. For project fields: empty/NA/[empty] → Upcoming."""
         s = str(val).strip()
-        if s in ("", "-1", "—", "None", "-") or not s: return "-"
-        try: return str(int(round(float(s))))
+        if s in ("", "-1", "—", "None", "-", "[empty]") or not s: return "-"
+        if s.upper() == "NA": return "Upcoming"
+        try:
+            f = float(s)
+            if f < 0: return "Upcoming"
+            return str(int(round(f)))
+        except: return s
+    def fmt_prj(val):
+        """For project cells: empty/NA/[empty] → Upcoming, explicit 0 → 0, score → int."""
+        s = str(val).strip()
+        if not s or s in ("-", "—", "-1", "[empty]", "None") or s.upper() == "NA":
+            return "Upcoming"
+        try:
+            f = float(s)
+            if f < 0: return "Upcoming"
+            return str(int(round(f)))
         except: return s
 
     # Row 1
@@ -318,28 +333,29 @@ def draw_report_v4(req: ReportRequest):
     y_sec2 += r_h
 
     def fmt_atc(val):
-        try:
-            f = float(str(val).replace('%',''))
-            if 0 < f <= 1.0: return f"{int(round(f * 100))}%"
-            if "%" not in str(val): return f"{int(f)}%"
-        except: pass
         s = str(val).strip()
-        if s in ["", "-", "—", "None"]: return "100%"
+        if not s or s in ["-", "—", "None", "[empty]"]: return "-"
+        try:
+            f = float(s.replace('%',''))
+            if 0 < f <= 1.0: return f"{int(round(f * 100))}%"
+            if "%" not in s: return f"{int(round(f))}%"
+        except: pass
         return s
 
     rows = [
-        ("Course 1 - Python", req.atr1, "-"),
-        ("Course 2 - Vibe Coding & n8n", req.atr2, req.prj1),
-        ("Course 3 - Machine Learning", req.atr3, req.prj2),
-        ("Course 4 - Deep Learning", req.atr4, req.prj3),
-        ("Course 5 - Visual Model & RAG", req.atr5, req.prj4),
-        ("Course 6 - Large Language Model", req.atr6, "-"),
-        ("Course 7 - Speech Model & Agentic AI", req.atr7, "-")
+        ("Course 1 - Python",                  req.atr1, None),       # no project
+        ("Course 2 - Vibe Coding & n8n",        req.atr2, req.prj1),   # prj1 from sheet
+        ("Course 3 - Machine Learning",          req.atr3, req.prj2),   # prj2 from sheet
+        ("Course 4 - Deep Learning",             req.atr4, req.prj3),   # prj3 from sheet
+        ("Course 5 - Visual Model & RAG",        req.atr5, req.prj4),   # prj4 from sheet
+        ("Course 6 - Large Language Model",      req.atr6, None),       # no project
+        ("Course 7 - Speech Model & Agentic AI", req.atr7, None),       # no project
     ]
     for m, a, p in rows:
         draw_cell(draw, margin_x, y_sec2, c1, r_h, m, F_VAL_B, "#FFFFFF", C_TEXT_BOLD, align="center")
         draw_cell(draw, margin_x+c1, y_sec2, c2, r_h, fmt_atc(a), F_VAL, "#FFFFFF", C_TEXT)
-        draw_cell(draw, margin_x+c1+c2, y_sec2, c3, r_h, fmt_sc(p), F_VAL, "#FFFFFF", C_TEXT)
+        prj_display = "-" if p is None else fmt_prj(p)
+        draw_cell(draw, margin_x+c1+c2, y_sec2, c3, r_h, prj_display, F_VAL, "#FFFFFF", C_TEXT)
         y_sec2 += r_h
 
     # --- 4. SCORE RECAP & GRADING SCALE ---
@@ -452,3 +468,8 @@ def generate_cert(req: CertRequest, filename: Optional[str] = None, format: Opti
 @app.post("/generate_report")
 def generate_report(req: ReportRequest):
     return Response(content=draw_report_v4(req), media_type="image/png")
+
+@app.post("/debug_report")
+def debug_report(req: ReportRequest):
+    """Echo raw payload — inspect what n8n actually sends."""
+    return req.model_dump()
