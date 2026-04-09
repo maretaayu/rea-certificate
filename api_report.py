@@ -56,7 +56,7 @@ class ReportRequest(BaseModel):
 
 def fmt_val(val) -> str:
     s = str(val).strip()
-    if not s or s in ('', '-1', '-', '—'):
+    if not s or s in ('', '-1', '-', '—', '[empty]'):
         return '—'
     try:
         f = float(s)
@@ -73,7 +73,7 @@ def fmt_prj(val) -> tuple:
       - numeric > 0               → actual score            → str        (no dim)
     """
     s = str(val).strip()
-    if not s or s in ('-', '—', '-1') or s.upper() == 'NA':
+    if not s or s in ('-', '—', '-1', '[empty]') or s.upper() == 'NA':
         return ('Upcoming', 'dim')      # project not started / deadline not reached
     try:
         f = float(s)
