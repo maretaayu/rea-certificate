@@ -96,13 +96,14 @@ def render_report_html(req: ReportRequest) -> bytes:
     }
     status_class = status_classes.get(status_str, "status-passed")
 
-    # Courses 2–5 have projects; Course 1,6,7 do not (handled in HTML as —)
+    # Sheet column mapping: prj1→Course2, prj2→Course3, prj3→Course4, prj4→Course5
+    # Course 1, 6, 7 have no project (handled as — in HTML)
     prj_courses = [
         (str(req.atr1), None),          # Course 1 — no project
-        (str(req.atr2), req.prj2),      # Course 2
-        (str(req.atr3), req.prj3),      # Course 3
-        (str(req.atr4), req.prj4),      # Course 4
-        (str(req.atr5), req.prj5),      # Course 5
+        (str(req.atr2), req.prj1),      # Course 2 ← prj1 from sheet
+        (str(req.atr3), req.prj2),      # Course 3 ← prj2 from sheet
+        (str(req.atr4), req.prj3),      # Course 4 ← prj3 from sheet
+        (str(req.atr5), req.prj4),      # Course 5 ← prj4 from sheet
         (str(req.atr6), None),          # Course 6 — no project
         (str(req.atr7), None),          # Course 7 — no project
     ]
