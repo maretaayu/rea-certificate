@@ -179,3 +179,8 @@ def generate_report(req: ReportRequest, format: Optional[str] = None):
         media_type = "image/png",
         headers    = {"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+@app.post("/debug_report")
+def debug_report(req: ReportRequest):
+    """Echo raw request payload — use this to inspect what n8n actually sends."""
+    return req.model_dump()
