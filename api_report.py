@@ -68,19 +68,17 @@ def fmt_val(val) -> str:
 def fmt_prj(val) -> tuple:
     """Returns (display_value, dim_class).
     Logic:
-      - No value / empty / '-' / '—'  → student not submitted → '0'       (no dim)
-      - 'NA' / 'na'                   → deadline not passed   → 'Upcoming' (dim)
-      - numeric >= 0                  → actual score          → str        (no dim)
+      - Empty / '-' / '—' / 'NA'  → project not started yet → 'Upcoming' (dim)
+      - 0 (explicit)              → student did not submit  → '0'        (no dim)
+      - numeric > 0               → actual score            → str        (no dim)
     """
     s = str(val).strip()
-    if not s or s in ('-', '—', '-1'):
-        return ('0', '')                # not submitted = 0
-    if s.upper() == 'NA':
-        return ('Upcoming', 'dim')      # deadline not reached
+    if not s or s in ('-', '—', '-1') or s.upper() == 'NA':
+        return ('Upcoming', 'dim')      # project not started / deadline not reached
     try:
         f = float(s)
         if f < 0:
-            return ('0', '')            # negative treated as not submitted
+            return ('Upcoming', 'dim')  # treat negative as not started
         return (str(int(f)) if f == int(f) else s, '')
     except ValueError:
         return (s, '')
