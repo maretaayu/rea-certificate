@@ -54,6 +54,16 @@ class ReportRequest(BaseModel):
     atr6          : Union[str, int, float] = ""
     atr7          : Union[str, int, float] = ""
 
+def fmt_score(val) -> str:
+    """Round numeric score to nearest integer for display."""
+    s = str(val).strip()
+    if not s or s in ('', '-1', '-', '—', '[empty]'):
+        return '—'
+    try:
+        return str(round(float(s)))
+    except ValueError:
+        return s
+
 def fmt_val(val) -> str:
     s = str(val).strip()
     if not s or s in ('', '-1', '-', '—', '[empty]'):
@@ -115,7 +125,7 @@ def render_report_html(req: ReportRequest) -> bytes:
         '{{NAME}}':             str(req.name),
         '{{STUDENT_ID}}':       str(req.student_id),
         '{{BATCH}}':            str(req.batch),
-        '{{CURRENT_SCORE}}':    str(req.current_score),
+        '{{CURRENT_SCORE}}':    fmt_score(req.current_score),
         '{{GRADE}}':            str(req.current_grade),
         '{{STATUS}}':           status_str,
         '{{STATUS_TAG_CLASS}}': status_class,
