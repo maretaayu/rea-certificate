@@ -282,6 +282,7 @@ def draw_report_v4(req: ReportRequest):
     def fmt_sc(val):
         """For scores: round to int. For project fields: empty/NA/[empty] → Upcoming."""
         s = str(val).strip()
+        if s in ("0", "0.0"): return "0"
         if s in ("", "-1", "—", "None", "-", "[empty]") or not s: return "-"
         if s.upper() == "NA": return "Upcoming"
         try:
@@ -292,6 +293,7 @@ def draw_report_v4(req: ReportRequest):
     def fmt_prj(val):
         """For project cells: empty/NA/[empty] → Upcoming, explicit 0 → 0, score → int."""
         s = str(val).strip()
+        if s in ("0", "0.0"): return "0"
         if not s or s in ("-", "—", "-1", "[empty]", "None") or s.upper() == "NA":
             return "Upcoming"
         try:
