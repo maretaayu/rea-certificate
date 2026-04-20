@@ -100,7 +100,7 @@ class ReportRequest(BaseModel):
     name: str; student_id: str; batch: str = BATCH
     current_score: Union[str, float] = 0; current_grade: str = ""; current_status: str = ""
     atc_accum: Union[str, float] = "0%"; pre_test: str = "—"; post_test: str = "—"; fp: str = "—"
-    atr1: str = "—"; prj1: str = "—"; atr2: str = "—"; prj2: str = "—"; atr3: str = "—"; prj3: str = "—"
+    atr1: str = "—"; prj0: str = "—"; prj1: str = "—"; atr2: str = "—"; prj2: str = "—"; atr3: str = "—"; prj3: str = "—"
     atr4: str = "—"; prj4: str = "—"; atr5: str = "—"; atr6: str = "—"; atr7: str = "—"
 
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -345,7 +345,7 @@ def draw_report_v4(req: ReportRequest):
         return s
 
     rows = [
-        ("Course 1 - Python",                  req.atr1, None),       # no project
+        ("Course 1 - Python",                  req.atr1, req.prj0),   # prj0 from sheet
         ("Course 2 - Vibe Coding & n8n",        req.atr2, req.prj1),   # prj1 from sheet
         ("Course 3 - Machine Learning",          req.atr3, req.prj2),   # prj2 from sheet
         ("Course 4 - Deep Learning",             req.atr4, req.prj3),   # prj3 from sheet

@@ -42,6 +42,7 @@ class ReportRequest(BaseModel):
     post_test     : Union[str, int, float] = ""
     fp            : Union[str, int, float] = ""
     atr1          : Union[str, int, float] = ""
+    prj0          : Union[str, int, float] = ""
     prj1          : Union[str, int, float] = ""
     atr2          : Union[str, int, float] = ""
     prj2          : Union[str, int, float] = ""
@@ -109,7 +110,7 @@ def render_report_html(req: ReportRequest) -> bytes:
     # Sheet column mapping: prj1→Course2, prj2→Course3, prj3→Course4, prj4→Course5
     # Course 1, 6, 7 have no project (handled as — in HTML)
     prj_courses = [
-        (str(req.atr1), None),          # Course 1 — no project
+        (str(req.atr1), req.prj0),      # Course 1 ← prj0 from sheet
         (str(req.atr2), req.prj1),      # Course 2 ← prj1 from sheet
         (str(req.atr3), req.prj2),      # Course 3 ← prj2 from sheet
         (str(req.atr4), req.prj3),      # Course 4 ← prj3 from sheet
