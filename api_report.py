@@ -42,7 +42,7 @@ class ReportRequest(BaseModel):
     post_test     : Union[str, int, float] = ""
     fp            : Union[str, int, float] = ""
     atr1          : Union[str, int, float] = ""
-    prj0          : Union[str, int, float] = Field("", alias="Prj0")
+    prj0          : Union[str, int, float] = ""
     prj1          : Union[str, int, float] = ""
     atr2          : Union[str, int, float] = ""
     prj2          : Union[str, int, float] = ""
@@ -56,6 +56,7 @@ class ReportRequest(BaseModel):
     atr7          : Union[str, int, float] = ""
 
     model_config = {
+        "alias_generator": lambda s: s.replace("_", "").capitalize(),
         "populate_by_name": True,
         "extra": "ignore"
     }
