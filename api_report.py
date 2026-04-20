@@ -15,7 +15,7 @@ except ImportError:
     pass
 
 BASE_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
-BATCH    = "10"
+BATCH    = "11"
 
 app = FastAPI(
     title       = "REA Report API",

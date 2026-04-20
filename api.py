@@ -14,7 +14,7 @@ from typing import Optional, Union, Any
 
 # --- CONFIG ---
 BASE_DIR       = Path(os.path.dirname(os.path.abspath(__file__)))
-BATCH          = "10"
+BATCH          = "11"
 ASSETS_DIR     = BASE_DIR / "assets"
 TEMPLATE_COC   = ASSETS_DIR / "template_coc_blank.png"
 TEMPLATE_COE   = ASSETS_DIR / "template_coe_blank.png"
@@ -324,7 +324,7 @@ def draw_report_v4(req: ReportRequest):
     # Row 3
     y_grid += r_h
     draw_cell(draw, margin_x, y_grid, l_lbl_w, r_h, "Program", F_TH, C_LIGHT, C_TEXT)
-    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, "AI Engineering Bootcamp Batch 10", F_VAL, "#FFFFFF", C_TEXT_BOLD, align="left")
+    draw_cell(draw, margin_x+l_lbl_w, y_grid, l_val_w, r_h, f"AI Engineering Bootcamp Batch {req.batch}", F_VAL, "#FFFFFF", C_TEXT_BOLD, align="left")
     draw_cell(draw, margin_x+w_left, y_grid, r_lbl_w, r_h, "Status", F_TH, C_LIGHT, C_TEXT)
     draw_cell(draw, margin_x+w_left+r_lbl_w, y_grid, r_val_w, r_h, str(req.current_status).title(), F_VAL, "#FFFFFF", C_TEXT_BOLD)
 
