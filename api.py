@@ -9,8 +9,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional, Union
+from pydantic import BaseModel, Field
+from typing import Optional, Union, Any
 
 # --- CONFIG ---
 BASE_DIR       = Path(os.path.dirname(os.path.abspath(__file__)))
@@ -100,8 +100,13 @@ class ReportRequest(BaseModel):
     name: str; student_id: str; batch: str = BATCH
     current_score: Union[str, float] = 0; current_grade: str = ""; current_status: str = ""
     atc_accum: Union[str, float] = "0%"; pre_test: str = "—"; post_test: str = "—"; fp: str = "—"
-    atr1: str = "—"; prj0: str = "—"; prj1: str = "—"; atr2: str = "—"; prj2: str = "—"; atr3: str = "—"; prj3: str = "—"
+    atr1: str = "—"; prj0: str = Field("—", alias="Prj0"); prj1: str = "—"; atr2: str = "—"; prj2: str = "—"; atr3: str = "—"; prj3: str = "—"
     atr4: str = "—"; prj4: str = "—"; atr5: str = "—"; atr6: str = "—"; atr7: str = "—"
+
+    model_config = {
+        "populate_by_name": True,
+        "extra": "ignore"
+    }
 
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
 def pct_to_float(val: Union[str, int, float]) -> float:

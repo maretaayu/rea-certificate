@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional, Union
+from pydantic import BaseModel, Field
+from typing import Optional, Union, Any
 import uuid
 
 # Playwright
@@ -42,7 +42,7 @@ class ReportRequest(BaseModel):
     post_test     : Union[str, int, float] = ""
     fp            : Union[str, int, float] = ""
     atr1          : Union[str, int, float] = ""
-    prj0          : Union[str, int, float] = ""
+    prj0          : Union[str, int, float] = Field("", alias="Prj0")
     prj1          : Union[str, int, float] = ""
     atr2          : Union[str, int, float] = ""
     prj2          : Union[str, int, float] = ""
@@ -54,6 +54,11 @@ class ReportRequest(BaseModel):
     prj5          : Union[str, int, float] = ""
     atr6          : Union[str, int, float] = ""
     atr7          : Union[str, int, float] = ""
+
+    model_config = {
+        "populate_by_name": True,
+        "extra": "ignore"
+    }
 
 def fmt_score(val) -> str:
     """Round numeric score to nearest integer for display."""
